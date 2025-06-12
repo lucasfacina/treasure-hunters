@@ -9,11 +9,8 @@ class GameManager {
     std::shared_ptr<Player> player2;
 
 public:
-    GameManager(
-        const int mapWidth,
-        const int mapHeight
-    ) {
-        this->map_manager = std::make_shared<MapManager>(mapWidth, mapHeight);
+    GameManager() {
+        this->map_manager = std::make_shared<MapManager>();
 
         this->map_manager->addLayer("assets/mapa_fundo_grama.csv");
         this->map_manager->addLayer("assets/mapa_borda_floresta.csv");

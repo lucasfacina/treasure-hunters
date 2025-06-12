@@ -11,31 +11,24 @@
 class Layer {
     int **tiles;
 
-    int mapWidth;
-    int mapHeight;
-
 public:
-    explicit Layer(
-        const int mapWidth,
-        const int mapHeight)
-        : mapWidth(mapWidth)
-          , mapHeight(mapHeight) {
-        tiles = new int *[mapWidth];
-        for (int i = 0; i < mapWidth; ++i) {
-            tiles[i] = new int[mapHeight];
-            for (int j = 0; j < mapHeight; ++j) {
+    explicit Layer() {
+        tiles = new int *[Settings::MAP_WIDTH];
+        for (int i = 0; i < Settings::MAP_WIDTH; ++i) {
+            tiles[i] = new int[Settings::MAP_HEIGHT];
+            for (int j = 0; j < Settings::MAP_HEIGHT; ++j) {
                 tiles[i][j] = -1;
             }
         }
     }
 
     ~Layer() {
-        for (int i = 0; i < mapWidth; ++i)
+        for (int i = 0; i < Settings::MAP_WIDTH; ++i)
             delete[] tiles[i];
         delete[] tiles;
     }
 
-    void load(const char *filename, std::vector<std::shared_ptr<GameObject> > &gameObjects) const {
+    void load(const char *filename, std::vector<std::shared_ptr<GameObject>> &gameObjects) const {
         FILE *file = fopen(filename, "r");
         if (!file) {
             printf("Erro ao abrir o arquivo de assets: %s\n", filename);
@@ -44,10 +37,10 @@ public:
 
         char line[4096];
         int row = 0;
-        while (fgets(line, sizeof(line), file) && row < this->mapHeight) {
+        while (fgets(line, sizeof(line), file) && row < Settings::MAP_HEIGHT) {
             int col = 0;
             const char *token = strtok(line, ",");
-            while (token != nullptr && col < this->mapWidth) {
+            while (token != nullptr && col < Settings::MAP_WIDTH) {
                 const int tileIndex = atoi(token);
 
                 auto gameObj = createById(tileIndex, col, row);
@@ -56,7 +49,7 @@ public:
                     gameObjects.push_back(gameObj);
 
                     if (!gameObj->isSelfRender())
-                    this->setTileAt(col, row, tileIndex);
+                        this->setTileAt(col, row, tileIndex);
                 } else {
                     this->setTileAt(col, row, tileIndex);
                 }
@@ -76,7 +69,7 @@ public:
     }
 
     bool isValidCoord(const int x, const int y) const {
-        return x >= 0 && x < mapWidth && y >= 0 && y < mapHeight;
+        return x >= 0 && x < Settings::MAP_WIDTH && y >= 0 && y < Settings::MAP_HEIGHT;
     }
 
     void setTileAt(const int x, const int y, const int tileIndex) const {
@@ -87,8 +80,8 @@ public:
     }
 
     void draw() const {
-        for (int y = 0; y < this->mapHeight; ++y) {
-            for (int x = 0; x < this->mapWidth; ++x) {
+        for (int y = 0; y < Settings::MAP_HEIGHT; ++y) {
+            for (int x = 0; x < Settings::MAP_WIDTH; ++x) {
                 const int tile_index = this->tiles[x][y];
                 if (tile_index < 0) continue;
 

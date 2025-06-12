@@ -3,32 +3,19 @@
 #include <vector>
 
 #include "layer.h"
-#include "treasure.h"
 
 class MapManager {
-    std::vector<std::shared_ptr<Layer> > layers;
-    std::vector<std::shared_ptr<GameObject> > gameObjects;
-
-    int mapWidth;
-    int mapHeight;
+    std::vector<std::shared_ptr<Layer>> layers;
+    std::vector<std::shared_ptr<GameObject>> gameObjects;
 
 public:
-    explicit MapManager(
-        const int mapWidth,
-        const int mapHeight)
-        : mapWidth(mapWidth)
-          , mapHeight(mapHeight) {
-    }
-
     ~MapManager() {
         this->layers.clear();
+        this->gameObjects.clear();
     }
 
     void addLayer(const char *csv_map_file) {
-        auto new_layer = std::make_shared<Layer>(
-            this->mapWidth,
-            this->mapHeight
-        );
+        auto new_layer = std::make_shared<Layer>();
 
         new_layer->load(csv_map_file, this->gameObjects);
 

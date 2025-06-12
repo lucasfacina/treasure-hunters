@@ -9,12 +9,6 @@
 #include "sprites.h"
 #include "game_manager.h"
 
-#define MAP_WIDTH       50
-#define MAP_HEIGHT      30
-#define SCREEN_WIDTH    (16 * MAP_WIDTH)
-#define SCREEN_HEIGHT   (16 * MAP_HEIGHT)
-#define FPS             60
-
 using namespace std;
 
 ALLEGRO_DISPLAY *display = nullptr;
@@ -42,7 +36,10 @@ int initAllegro() {
         return false;
     }
 
-    display = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
+    display = al_create_display(
+        Settings::MAP_WIDTH * Settings::TILE_SIZE,
+        Settings::MAP_HEIGHT * Settings::TILE_SIZE
+    );
     if (!display) {
         printf("Falha ao criar display.\n");
         return false;
@@ -54,7 +51,7 @@ int initAllegro() {
         return false;
     }
 
-    timer = al_create_timer(1.0 / FPS);
+    timer = al_create_timer(1.0 / 60.0);
     al_start_timer(timer);
     if (!timer) {
         printf("Falha ao criar timer.\n");
@@ -76,7 +73,7 @@ void updateAndDraw() {
 
     bool stopRunning = false;
     bool shouldRender = true;
-    game_manager = make_shared<GameManager>(MAP_WIDTH, MAP_HEIGHT);
+    game_manager = make_shared<GameManager>();
     ALLEGRO_KEYBOARD_STATE key_state;
 
     while (!stopRunning) {
@@ -109,7 +106,7 @@ void destroyPointers() {
     al_destroy_timer(timer);
     al_destroy_event_queue(event_queue);
     al_destroy_display(display);
-    al_destroy_bitmap(GlobalSprites::spritesheet);
+    al_destroy_bitmap(Settings::spritesheet);
 }
 
 int main(int argc, char **argv) {
