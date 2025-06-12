@@ -63,10 +63,8 @@ class Player final : public GameObject {
         if (keyLeft) this->move(-PLAYER_SPEED, 0.0f);
         if (keyRight) this->move(PLAYER_SPEED, 0.0f);
 
-        if (oldX == this->x && oldY == this->y) return;
-
         if (holdingTreasureItem != nullptr)
-            holdingTreasureItem->move(this->x, this->y);
+            holdingTreasureItem->move(this->x - oldX, this->y - oldY);
     }
 
 public:
