@@ -6,7 +6,6 @@
 #include <allegro5/keyboard.h>
 
 #include "utils/settings.h"
-#include "managers/map_manager.h"
 
 class MapManager;
 

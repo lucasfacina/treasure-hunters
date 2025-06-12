@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "../utils/layer.h"
+#include "objects/game_object.h"
+#include "utils/object_factory.h"
 #include "utils/position.h"
 
 class MapManager final : public std::enable_shared_from_this<MapManager> {
