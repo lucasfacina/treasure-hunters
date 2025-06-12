@@ -4,7 +4,7 @@
 #include <allegro5/bitmap.h>
 #include <allegro5/bitmap_draw.h>
 
-#include "game_object.h"
+#include "../objects/game_object.h"
 #include "object_factory.h"
 #include "settings.h"
 

@@ -16,11 +16,11 @@ struct MovimentKeyMap {
 };
 
 class Player final : public GameObject {
-    std::vector<std::shared_ptr<GameObject> > gameObjects;
+    std::vector<std::shared_ptr<GameObject>> gameObjects;
 
     ALLEGRO_BITMAP *sprite;
     MovimentKeyMap keyMap;
-    std::shared_ptr<Treasure> holdingTreasureItem;
+    std::shared_ptr<TreasureObject> holdingTreasureItem;
 
     bool keyUp{false};
     bool keyDown{false};
@@ -30,17 +30,12 @@ class Player final : public GameObject {
     bool check_collision(
         const int nextX,
         const int nextY,
-        const std::vector<std::shared_ptr<GameObject> > &gameObj) override {
+        const std::vector<std::shared_ptr<GameObject>> &gameObj) override {
         for (const auto &obj: gameObj) {
-            if (obj == holdingTreasureItem) return false; // Não colidiu com o próprio tesouro que está sendo segurado
+            if (obj == holdingTreasureItem) continue; // Não colidiu com o próprio tesouro que está sendo segurado
+            if (nextX != obj->getX() && nextY != obj->getY()) continue; // Não há colisão com este objeto
 
-            std::cout << std::format("x ({}) -> {} | {}", x, nextX, obj->getX()) << std::endl;
-            std::cout << std::format("y ({}) -> {} | {}", y, nextY, obj->getY()) << std::endl;
-            std::cout << "=======================================" << std::endl;
-
-            if (nextX != obj->getX() && nextY != obj->getY()) return false; // Não há colisão com este objeto
-
-            if (const auto treasure = std::dynamic_pointer_cast<Treasure>(obj))
+            if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
                 if (holdingTreasureItem == nullptr) {
                     holdingTreasureItem = treasure;
                     return false; // Colisão com o tesouro, o jogador ficará em cima dele
@@ -51,6 +46,14 @@ class Player final : public GameObject {
                 holdingTreasureItem = nullptr;
                 return true; // Colisão com o baú, o jogador guarda o tesouro
             }
+        }
+
+        for (const auto &obj: gameObj) {
+
+
+
+
+
 
             return true; // Colisão com outro objeto
         }
@@ -73,14 +76,13 @@ public:
         const MovimentKeyMap &keyMap,
         const int startX,
         const int startY,
-        const std::vector<std::shared_ptr<GameObject> > &gameObjects
+        const std::vector<std::shared_ptr<GameObject>> &gameObjects
     )
         : GameObject(-1, startX, startY)
           , sprite(sprite)
           , keyMap(keyMap)
           , gameObjects(gameObjects)
-          , holdingTreasureItem(nullptr) {
-    }
+          , holdingTreasureItem(nullptr) {}
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
         if (event->type != ALLEGRO_EVENT_TIMER) return;

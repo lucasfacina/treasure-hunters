@@ -2,7 +2,7 @@
 #define MAP_MANAGER_H
 #include <vector>
 
-#include "layer.h"
+#include "../utils/layer.h"
 
 class MapManager {
     std::vector<std::shared_ptr<Layer>> layers;
@@ -30,7 +30,7 @@ public:
             gameObject->draw();
     }
 
-    std::vector<std::shared_ptr<GameObject> >& getGameObjects() {
+    std::vector<std::shared_ptr<GameObject>> &getGameObjects() {
         return this->gameObjects;
     }
 };

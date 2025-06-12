@@ -1,12 +1,12 @@
-#ifndef TREASURE_H
-#define TREASURE_H
+#ifndef TREASURE_OBJECT_H
+#define TREASURE_OBJECT_H
 #include "game_object.h"
 
-class Treasure final : public GameObject {
+class TreasureObject final : public GameObject {
     int value;
 
 public:
-    explicit Treasure(
+    explicit TreasureObject(
         const int tileId,
         const int value,
         const int startX,
@@ -16,4 +16,4 @@ public:
     }
 };
 
-#endif //TREASURE_H
+#endif //TREASURE_OBJECT_H
