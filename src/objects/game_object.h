@@ -1,9 +1,18 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 #include <iostream>
+#include <allegro5/bitmap_draw.h>
+#include <allegro5/events.h>
+#include <allegro5/keyboard.h>
 
-class GameObject {
+#include "utils/settings.h"
+#include "managers/map_manager.h"
+
+class MapManager;
+
+class GameObject : public std::enable_shared_from_this<GameObject> {
 protected:
+    std::shared_ptr<MapManager> mapManager;
     int x;
     int y;
     bool selfRender;
@@ -19,8 +28,7 @@ public:
         : x(startX)
           , y(startY)
           , selfRender(false)
-          , tileId(-1) {
-    }
+          , tileId(-1) {}
 
     explicit GameObject(
         const int tileId,
@@ -29,30 +37,20 @@ public:
         : x(startX)
           , y(startY)
           , selfRender(true)
-          , tileId(tileId) {
-    }
+          , tileId(tileId) {}
 
-    void move(const int offsetX, const int offsetY, const std::vector<std::shared_ptr<GameObject> > &gameObjects) {
-        const auto newX = this->x + offsetX;
-        const auto newY = this->y + offsetY;
-
-        if (!this->check_collision(newX, newY, gameObjects)) {
-            x = newX;
-            y = newY;
-        }
-    }
+    void move(int offsetX, int offsetY);
 
     void setPosition(const int newX, const int newY) {
         x = newX;
         y = newY;
     }
 
-    virtual bool check_collision(const int x, const int y, const std::vector<std::shared_ptr<GameObject> > &) {
+    virtual bool check_collision(const int targetX, const int targetY) {
         return false;
     }
 
-    virtual void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) {
-    }
+    virtual void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) {}
 
     virtual void draw() const {
         if (!selfRender) return;
@@ -74,6 +72,10 @@ public:
     [[nodiscard]] bool isSelfRender() const { return selfRender; }
     [[nodiscard]] int getX() const { return x; }
     [[nodiscard]] int getY() const { return y; }
+
+    void injectMapManager(const std::shared_ptr<MapManager> &mapManager) {
+        this->mapManager = mapManager;
+    }
 };
 
 #endif //GAME_OBJECT_H

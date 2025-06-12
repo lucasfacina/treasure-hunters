@@ -16,8 +16,6 @@ struct MovimentKeyMap {
 };
 
 class Player final : public GameObject {
-    std::vector<std::shared_ptr<GameObject>> gameObjects;
-
     ALLEGRO_BITMAP *sprite;
     MovimentKeyMap keyMap;
     std::shared_ptr<TreasureObject> holdingTreasureItem;
@@ -28,46 +26,47 @@ class Player final : public GameObject {
     bool keyRight{false};
 
     bool check_collision(
-        const int nextX,
-        const int nextY,
-        const std::vector<std::shared_ptr<GameObject>> &gameObj) override {
-        for (const auto &obj: gameObj) {
-            if (obj == holdingTreasureItem) continue; // Não colidiu com o próprio tesouro que está sendo segurado
-            if (nextX != obj->getX() && nextY != obj->getY()) continue; // Não há colisão com este objeto
+        const int targetX,
+        const int targetY) override {
+        // for (const auto &obj: gameObj) {
+        // if (obj == holdingTreasureItem) continue; // Não colidiu com o próprio tesouro que está sendo segurado
+        // if (nextX != obj->getX() && nextY != obj->getY()) continue; // Não há colisão com este objeto
 
-            if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
-                if (holdingTreasureItem == nullptr) {
-                    holdingTreasureItem = treasure;
-                    return false; // Colisão com o tesouro, o jogador ficará em cima dele
-                }
+        // if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
+        // if (holdingTreasureItem == nullptr) {
+        // holdingTreasureItem = treasure;
+        // return false; // Colisão com o tesouro, o jogador ficará em cima dele
+        // }
 
-            if (std::dynamic_pointer_cast<ChestObject>(obj) && holdingTreasureItem != nullptr) {
-                std::cout << "Guardou o tesouro" << std::endl;
-                holdingTreasureItem = nullptr;
-                return true; // Colisão com o baú, o jogador guarda o tesouro
-            }
-        }
+        // if (std::dynamic_pointer_cast<ChestObject>(obj) && holdingTreasureItem != nullptr) {
+        // std::cout << "Guardou o tesouro" << std::endl;
+        // holdingTreasureItem = nullptr;
+        // return true; // Colisão com o baú, o jogador guarda o tesouro
+        // }
+        // }
 
-        for (const auto &obj: gameObj) {
+        // for (const auto &obj: gameObj) {
 
-
-
-
-
-
-            return true; // Colisão com outro objeto
-        }
+        // return true; // Colisão com outro objeto
+        // }
         return false; // Não há colisão com nenhum objeto
     }
 
     void update_position() {
-        if (keyUp) this->move(0.0f, -PLAYER_SPEED, this->gameObjects);
-        if (keyDown) this->move(0.0f, PLAYER_SPEED, this->gameObjects);
-        if (keyLeft) this->move(-PLAYER_SPEED, 0.0f, this->gameObjects);
-        if (keyRight) this->move(PLAYER_SPEED, 0.0f, this->gameObjects);
+        const auto oldX = this->x;
+        const auto oldY = this->y;
+
+        if (keyUp) this->move(0.0f, -PLAYER_SPEED);
+        if (keyDown) this->move(0.0f, PLAYER_SPEED);
+        if (keyLeft) this->move(-PLAYER_SPEED, 0.0f);
+        if (keyRight) this->move(PLAYER_SPEED, 0.0f);
+
+        if (oldX == this->x && oldY == this->y) return;
+
+        std::cout << std::format("Player: ({} -> {}, {} -> {})", oldX, this->x, oldY, this->y) << std::endl;
 
         if (holdingTreasureItem != nullptr)
-            holdingTreasureItem->setPosition(this->x, this->y);
+            holdingTreasureItem->move(this->x, this->y);
     }
 
 public:
@@ -75,13 +74,10 @@ public:
         ALLEGRO_BITMAP *sprite,
         const MovimentKeyMap &keyMap,
         const int startX,
-        const int startY,
-        const std::vector<std::shared_ptr<GameObject>> &gameObjects
-    )
+        const int startY)
         : GameObject(-1, startX, startY)
           , sprite(sprite)
           , keyMap(keyMap)
-          , gameObjects(gameObjects)
           , holdingTreasureItem(nullptr) {}
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {

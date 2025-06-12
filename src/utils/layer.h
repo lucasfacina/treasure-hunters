@@ -28,40 +28,6 @@ public:
         delete[] tiles;
     }
 
-    void load(const char *filename, std::vector<std::shared_ptr<GameObject>> &gameObjects) const {
-        FILE *file = fopen(filename, "r");
-        if (!file) {
-            printf("Erro ao abrir o arquivo de assets: %s\n", filename);
-            return;
-        }
-
-        char line[4096];
-        int row = 0;
-        while (fgets(line, sizeof(line), file) && row < Settings::MAP_HEIGHT) {
-            int col = 0;
-            const char *token = strtok(line, ",");
-            while (token != nullptr && col < Settings::MAP_WIDTH) {
-                const int tileIndex = atoi(token);
-
-                auto gameObj = createById(tileIndex, col, row);
-
-                if (gameObj != nullptr) {
-                    gameObjects.push_back(gameObj);
-
-                    if (!gameObj->isSelfRender())
-                        this->setTileAt(col, row, tileIndex);
-                } else {
-                    this->setTileAt(col, row, tileIndex);
-                }
-
-                token = strtok(nullptr, ",");
-                col++;
-            }
-            row++;
-        }
-        fclose(file);
-    }
-
     bool isValidTileIndex(const int tileIndex) const {
         const int tileset_cols = al_get_bitmap_width(Settings::spritesheet) / Settings::TILE_SIZE;
         const int tileset_rows = al_get_bitmap_height(Settings::spritesheet) / Settings::TILE_SIZE;

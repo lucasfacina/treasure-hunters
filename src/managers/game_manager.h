@@ -26,14 +26,14 @@ public:
         this->player1 = std::make_shared<Player>(
             al_load_bitmap(asset("player1.png")),
             MovimentKeyMap{ALLEGRO_KEY_W, ALLEGRO_KEY_S, ALLEGRO_KEY_A, ALLEGRO_KEY_D},
-            8, 3,
-            this->map_manager->getGameObjects());
+            8, 3);
+        this->player1->injectMapManager(map_manager);
 
         this->player2 = std::make_shared<Player>(
             al_load_bitmap(asset("player2.png")),
             MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
-            41, 3,
-            this->map_manager->getGameObjects());
+            41, 3);
+        this->player2->injectMapManager(map_manager);
     }
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) const {
