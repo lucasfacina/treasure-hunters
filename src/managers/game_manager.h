@@ -23,12 +23,14 @@ public:
         this->map_manager->addLayer(asset("mapa_tesouros.csv"));
 
         this->player1 = std::make_shared<Player>(
+            BLUE,
             al_load_bitmap(asset("player1.png")),
             MovimentKeyMap{ALLEGRO_KEY_W, ALLEGRO_KEY_S, ALLEGRO_KEY_A, ALLEGRO_KEY_D},
             8, 3);
         this->player1->injectMapManager(map_manager);
 
         this->player2 = std::make_shared<Player>(
+            PINK,
             al_load_bitmap(asset("player2.png")),
             MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
             41, 3);

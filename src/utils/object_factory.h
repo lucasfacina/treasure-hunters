@@ -31,8 +31,8 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
         return std::make_shared<CollidableObject>(x, y);
 
     switch (id) {
-        case 27: return std::make_shared<ChestObject>(x, y);
-        case 44: return std::make_shared<ChestObject>(x, y);
+        case 27: return std::make_shared<ChestObject>(PINK, x, y);
+        case 44: return std::make_shared<ChestObject>(BLUE, x, y);
 
         // Tesouros de Bronze
         case 278: return std::make_shared<TreasureObject>(id, 10, x, y); // Moeda

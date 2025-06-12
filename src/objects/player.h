@@ -19,6 +19,8 @@ class Player final : public GameObject {
     MovimentKeyMap keyMap;
     std::shared_ptr<TreasureObject> holdingTreasureItem;
 
+    PlayerType type;
+
     bool keyUp{false};
     bool keyDown{false};
     bool keyLeft{false};
@@ -69,11 +71,13 @@ class Player final : public GameObject {
 
 public:
     explicit Player(
+        PlayerType type,
         ALLEGRO_BITMAP *sprite,
         const MovimentKeyMap &keyMap,
         const int startX,
         const int startY)
         : GameObject(-1, startX, startY)
+          , type(type)
           , sprite(sprite)
           , keyMap(keyMap)
           , holdingTreasureItem(nullptr) {
