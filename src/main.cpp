@@ -35,6 +35,11 @@ void calculateScreenSize(int &screen_width, int &screen_height) {
     // Escolhe o MENOR fator de escala para garantir que o mapa CAIBA no monitor
     Settings::SCALE = std::min(scale_by_width, scale_by_height);
 
+    // Reduz o SCALE se não for 1 para evitar que o mapa fique muito grande
+    Settings::SCALE *= Settings::SCALE != 1
+                           ? 0.9F
+                           : 1.0f;
+
     // Calcula as dimensões finais do display usando o SCALE final
     screen_width = static_cast<int>(Settings::MAP_WIDTH * Settings::TILE_SIZE * Settings::SCALE);
     screen_height = static_cast<int>(Settings::MAP_HEIGHT * Settings::TILE_SIZE * Settings::SCALE);
