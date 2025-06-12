@@ -7,10 +7,14 @@ class ChestObject final : public GameObject {
     PlayerType playerType;
 
 public:
-    explicit ChestObject(PlayerType playerType, const int x, const int y)
+    explicit ChestObject(
+        const PlayerType playerType,
+        const int x, const int y)
         : GameObject(x, y)
     , playerType(playerType){
     }
+
+    [[nodiscard]] PlayerType getType() const { return playerType; }
 };
 
 #endif //CHEST_OBJECT_H

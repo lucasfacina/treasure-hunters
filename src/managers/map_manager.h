@@ -1,7 +1,8 @@
 #ifndef MAP_MANAGER_H
 #define MAP_MANAGER_H
 #include <vector>
-#include<algorithm>
+#include <map>
+#include <algorithm>
 
 #include "../utils/layer.h"
 #include "objects/game_object.h"
@@ -9,12 +10,15 @@
 #include "utils/position.h"
 
 class MapManager final : public std::enable_shared_from_this<MapManager> {
-    std::vector<std::shared_ptr<Layer>> layers;
+    std::vector<std::shared_ptr<Layer> > layers;
 
     // Estrutura para iteração rápida sobre todos os objetos
-    std::vector<std::shared_ptr<GameObject>> allGameObjects;
+    std::vector<std::shared_ptr<GameObject> > allGameObjects;
+
     // Estrutura para busca rápida por posição
-    std::unordered_map<Position, std::vector<std::shared_ptr<GameObject>>, PositionHash> gameObjectsByPosition;
+    std::unordered_map<Position, std::vector<std::shared_ptr<GameObject> >, PositionHash> gameObjectsByPosition;
+
+    std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject> > > houseSlotByPlayerType;
 
     void loadLayer(const std::shared_ptr<Layer> &layer, const char *filename) {
         FILE *file = fopen(filename, "r");
@@ -35,6 +39,9 @@ class MapManager final : public std::enable_shared_from_this<MapManager> {
 
                 if (gameObj != nullptr) {
                     this->addGameObject(gameObj);
+
+                    if (const auto houseSlot = std::dynamic_pointer_cast<HouseSlotObject>(gameObj))
+                        this->houseSlotByPlayerType[houseSlot->getType()].push_back(houseSlot);
 
                     if (!gameObj->isSelfRender())
                         layer->setTileAt(col, row, tileIndex);
@@ -87,7 +94,7 @@ public:
         );
     }
 
-    std::vector<std::shared_ptr<GameObject>> findGameObjectsAt(int x, int y) {
+    std::vector<std::shared_ptr<GameObject> > findGameObjectsAt(int x, int y) {
         auto gameObjectsAtThePosition = gameObjectsByPosition.find({x, y});
         if (gameObjectsAtThePosition != gameObjectsByPosition.end())
             return gameObjectsAtThePosition->second;
@@ -118,7 +125,19 @@ public:
         gameObjectsByPosition[newPos].push_back(gameObject);
     }
 
-    const std::vector<std::shared_ptr<GameObject>> &getAllGameObjects() const {
+    bool storeTreasure(const std::shared_ptr<TreasureObject> &tresure, const std::shared_ptr<ChestObject> &chest) {
+        for (const auto &slot: houseSlotByPlayerType[chest->getType()]) {
+            if (!slot->isEmpty()) continue;
+
+            slot->store(tresure);
+            this->moveGameObject(tresure, slot->getX(), slot->getY());
+            return true;
+        }
+
+        return false;
+    }
+
+    const std::vector<std::shared_ptr<GameObject> > &getAllGameObjects() const {
         return allGameObjects;
     }
 

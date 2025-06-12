@@ -6,6 +6,7 @@
 #include "../objects/collidable.h"
 #include "../objects/game_object.h"
 #include "../objects/treasure.h"
+#include "objects/house_slot.h"
 
 inline std::shared_ptr<GameObject> createById(const int id, const int x, const int y) {
     const bool floresta_borda = (id >= 0 && id <= 4) ||
@@ -31,6 +32,9 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
         return std::make_shared<CollidableObject>(x, y);
 
     switch (id) {
+        case 14: return std::make_shared<HouseSlotObject>(PINK, x, y);
+        case 65: return std::make_shared<HouseSlotObject>(BLUE, x, y);
+
         case 27: return std::make_shared<ChestObject>(PINK, x, y);
         case 44: return std::make_shared<ChestObject>(BLUE, x, y);
 

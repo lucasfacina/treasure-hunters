@@ -50,10 +50,8 @@ class Player final : public GameObject {
     }
 
     void saveTreasureItem(const std::shared_ptr<ChestObject> &chest) {
-        if (chest == nullptr) return;
-
-        std::cout << "Guardou o tesouro!" << std::endl;
-        holdingTreasureItem = nullptr;
+        if (this->mapManager->storeTreasure(holdingTreasureItem, chest))
+            holdingTreasureItem = nullptr;
     }
 
     void update_position() {
