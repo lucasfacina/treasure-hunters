@@ -77,7 +77,7 @@ int initAllegro() {
         return false;
     }
 
-    timer = al_create_timer(1.0 / 60.0);
+    timer = al_create_timer(1.0 / 15.0);
     al_start_timer(timer);
     if (!timer) {
         printf("Falha ao criar timer.\n");
