@@ -7,6 +7,7 @@ namespace Settings {
    inline const int MAP_HEIGHT = 30;
 
    inline const int TILE_SIZE = 16;
+   inline float SCALE = 1;
    inline int TILE_COLS = 0;
    inline ALLEGRO_BITMAP *spritesheet = nullptr;
 }

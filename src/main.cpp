@@ -11,6 +11,7 @@
 
 using namespace std;
 
+ALLEGRO_MONITOR_INFO monitor_info;
 ALLEGRO_DISPLAY *display = nullptr;
 ALLEGRO_EVENT_QUEUE *event_queue = nullptr;
 ALLEGRO_TIMER *timer = nullptr;
@@ -18,10 +19,36 @@ ALLEGRO_EVENT event;
 
 shared_ptr<GameManager> game_manager;
 
+void calculateScreenSize(int &screen_width, int &screen_height) {
+    // Largura e altura DISPONÍVEL do monitor
+    int monitor_width = monitor_info.x2 - monitor_info.x1;
+    int monitor_height = monitor_info.y2 - monitor_info.y1;
+
+    // Calcula o fator de escala baseado na LARGURA DISPONÍVEL
+    // Quanto do monitor a largura do nosso mapa (em pixels) ocuparia
+    float scale_by_width = static_cast<float>(monitor_width) / (Settings::MAP_WIDTH * Settings::TILE_SIZE);
+
+    // Calcula o fator de escala baseado na ALTURA DISPONÍVEL
+    // Quanto do monitor a altura do nosso mapa (em pixels) ocuparia
+    float scale_by_height = static_cast<float>(monitor_height) / (Settings::MAP_HEIGHT * Settings::TILE_SIZE);
+
+    // Escolhe o MENOR fator de escala para garantir que o mapa CAIBA no monitor
+    Settings::SCALE = std::min(scale_by_width, scale_by_height);
+
+    // Calcula as dimensões finais do display usando o SCALE final
+    screen_width = static_cast<int>(Settings::MAP_WIDTH * Settings::TILE_SIZE * Settings::SCALE);
+    screen_height = static_cast<int>(Settings::MAP_HEIGHT * Settings::TILE_SIZE * Settings::SCALE);
+}
+
 int initAllegro() {
     if (!al_init()) {
         printf("Falha ao inicializar Allegro.\n");
         return false;
+    }
+    if (!al_get_monitor_info(0, &monitor_info)) {
+        // 0 geralmente é o monitor principal
+        printf("Falha ao obter informações do monitor.\n");
+        return -1;
     }
     if (!al_install_keyboard()) {
         printf("Falha ao instalar teclado.\n");
@@ -36,10 +63,9 @@ int initAllegro() {
         return false;
     }
 
-    display = al_create_display(
-        Settings::MAP_WIDTH * Settings::TILE_SIZE,
-        Settings::MAP_HEIGHT * Settings::TILE_SIZE
-    );
+    int screen_width, screen_height;
+    calculateScreenSize(screen_width, screen_height);
+    display = al_create_display(screen_width, screen_height);
     if (!display) {
         printf("Falha ao criar display.\n");
         return false;
@@ -75,11 +101,15 @@ void updateAndDraw() {
     bool shouldRender = true;
     game_manager = make_shared<GameManager>();
     ALLEGRO_KEYBOARD_STATE key_state;
+    ALLEGRO_TRANSFORM transform;
 
     while (!stopRunning) {
         if (shouldRender && al_is_event_queue_empty(event_queue)) {
             shouldRender = false;
             al_clear_to_color(al_map_rgb(0, 0, 0));
+            al_identity_transform(&transform);
+            al_scale_transform(&transform, Settings::SCALE, Settings::SCALE);
+            al_use_transform(&transform);
             game_manager->draw();
             al_flip_display();
         }
