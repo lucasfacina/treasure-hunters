@@ -6,6 +6,7 @@
 
 #include "../utils/layer.h"
 #include "objects/game_object.h"
+#include "utils/draw_text.h"
 #include "utils/object_factory.h"
 #include "utils/position.h"
 
@@ -147,6 +148,23 @@ public:
 
         for (const auto &gameObject: this->allGameObjects)
             gameObject->draw();
+
+        constexpr auto xPadding = 5.5F;
+        constexpr auto yPadding = 0.5F;
+
+        drawText(
+            "Score: xxx",
+            xPadding, yPadding,
+            al_map_rgb(224, 243, 242),
+            al_map_rgb(13, 27, 54)
+        );
+
+        drawText(
+            "Score: xxx",
+            Settings::MAP_WIDTH - xPadding, yPadding,
+            al_map_rgb(251, 223, 229),
+            al_map_rgb(54, 4, 33)
+        );
     }
 };
 

@@ -1,6 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 #include <allegro5/bitmap.h>
+#include <allegro5/allegro_font.h>
 
 namespace Settings {
    inline const int MAP_WIDTH = 50;
@@ -10,6 +11,7 @@ namespace Settings {
    inline float SCALE = 1;
    inline int TILE_COLS = 0;
    inline ALLEGRO_BITMAP *spritesheet = nullptr;
+   inline ALLEGRO_FONT *font = nullptr;
 
 #ifdef _WIN32
    inline const char *ASSETS_PATH = "assets/";

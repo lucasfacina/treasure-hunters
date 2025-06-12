@@ -2,6 +2,8 @@
 #include <memory>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/events.h>
 #include <allegro5/keyboard.h>
 #include <allegro5/system.h>
@@ -76,13 +78,26 @@ int initAllegro() {
         return false;
     }
 
+    al_init_font_addon();
+    if (!al_init_ttf_addon()) {
+        printf("Falha ao inicializar o addon de ttf.\n");
+        return -1;
+    }
+
+    Settings::font = al_load_font(asset("PressStart2P.ttf"), 8, 0);
+    if (!Settings::font) {
+        std::cerr << "Falha ao carregar a fonte 'PressStart2P.ttf'." << std::endl;
+        al_destroy_display(display);
+        return -1;
+    }
+
     event_queue = al_create_event_queue();
     if (!event_queue) {
         printf("Falha ao criar event queue.\n");
         return false;
     }
 
-    timer = al_create_timer(1.0 / 15.0);
+    timer = al_create_timer(1.0 / 14.0);
     al_start_timer(timer);
     if (!timer) {
         printf("Falha ao criar timer.\n");
