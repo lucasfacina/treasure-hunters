@@ -3,55 +3,48 @@
 #include <vector>
 
 #include "layer.h"
+#include "treasure.h"
 
 class MapManager {
-    ALLEGRO_BITMAP *tilemap;
     std::vector<std::shared_ptr<Layer> > layers;
+    std::vector<std::shared_ptr<GameObject> > gameObjects;
 
     int mapWidth;
     int mapHeight;
-    int tileSize;
 
 public:
     explicit MapManager(
         const int mapWidth,
-        const int mapHeight,
-        const int tileSize)
+        const int mapHeight)
         : mapWidth(mapWidth)
-          , mapHeight(mapHeight)
-          , tileSize(tileSize) {
-        this->tilemap = al_load_bitmap("assets/cenario.png");
+          , mapHeight(mapHeight) {
     }
 
     ~MapManager() {
-        if (this->tilemap)
-            al_destroy_bitmap(this->tilemap);
-
         this->layers.clear();
     }
 
-    void addLayer(std::shared_ptr<Layer> layer) {
-        if (layer)
-            this->layers.push_back(layer);
-    }
-
-    void addLayer(const char *csv_map_file, bool collidable = false) {
+    void addLayer(const char *csv_map_file) {
         auto new_layer = std::make_shared<Layer>(
-            this->tilemap,
             this->mapWidth,
-            this->mapHeight,
-            this->tileSize,
-            collidable
+            this->mapHeight
         );
 
-        new_layer->load(csv_map_file);
+        new_layer->load(csv_map_file, this->gameObjects);
 
         this->layers.push_back(new_layer);
     }
 
-    void draw() {
-        for (const auto layer: this->layers)
+    void draw() const {
+        for (const auto &layer: this->layers)
             layer->draw();
+
+        for (const auto &gameObject: this->gameObjects)
+            gameObject->draw();
+    }
+
+    std::vector<std::shared_ptr<GameObject> >& getGameObjects() {
+        return this->gameObjects;
     }
 };
 

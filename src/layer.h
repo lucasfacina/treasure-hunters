@@ -4,26 +4,21 @@
 #include <allegro5/bitmap.h>
 #include <allegro5/bitmap_draw.h>
 
-class Layer {
-    ALLEGRO_BITMAP *tilemap;
-    int **tiles;
-    bool isCollidable;
+#include "game_object.h"
+#include "object_factory.h"
+#include "sprites.h"
 
-    int tileSize;
+class Layer {
+    int **tiles;
+
     int mapWidth;
     int mapHeight;
 
 public:
     explicit Layer(
-        ALLEGRO_BITMAP *tilemap,
         const int mapWidth,
-        const int mapHeight,
-        const int tileSize,
-        const bool collidable)
-        : tilemap(tilemap)
-          , isCollidable(collidable)
-          , tileSize(tileSize)
-          , mapWidth(mapWidth)
+        const int mapHeight)
+        : mapWidth(mapWidth)
           , mapHeight(mapHeight) {
         tiles = new int *[mapWidth];
         for (int i = 0; i < mapWidth; ++i) {
@@ -40,7 +35,7 @@ public:
         delete[] tiles;
     }
 
-    void load(const char *filename) {
+    void load(const char *filename, std::vector<std::shared_ptr<GameObject> > &gameObjects) const {
         FILE *file = fopen(filename, "r");
         if (!file) {
             printf("Erro ao abrir o arquivo de assets: %s\n", filename);
@@ -53,7 +48,19 @@ public:
             int col = 0;
             const char *token = strtok(line, ",");
             while (token != nullptr && col < this->mapWidth) {
-                this->setTileAt(col, row, atoi(token));
+                const int tileIndex = atoi(token);
+
+                auto gameObj = createById(tileIndex, col, row);
+
+                if (gameObj != nullptr) {
+                    gameObjects.push_back(gameObj);
+
+                    if (!gameObj->isSelfRender())
+                    this->setTileAt(col, row, tileIndex);
+                } else {
+                    this->setTileAt(col, row, tileIndex);
+                }
+
                 token = strtok(nullptr, ",");
                 col++;
             }
@@ -63,8 +70,10 @@ public:
     }
 
     bool isValidTileIndex(const int tileIndex) const {
-        const int tileset_cols = al_get_bitmap_width(this->tilemap) / this->tileSize;
-        const int tileset_rows = al_get_bitmap_height(this->tilemap) / this->tileSize;
+        auto teste = GlobalSprites::spritesheet;
+
+        const int tileset_cols = al_get_bitmap_width(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
+        const int tileset_rows = al_get_bitmap_height(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
         return tileIndex >= -1 && tileIndex < tileset_cols * tileset_rows;
     }
 
@@ -72,7 +81,7 @@ public:
         return x >= 0 && x < mapWidth && y >= 0 && y < mapHeight;
     }
 
-    void setTileAt(const int x, const int y, const int tileIndex) {
+    void setTileAt(const int x, const int y, const int tileIndex) const {
         if (!this->isValidCoord(x, y)) return;
         if (!this->isValidTileIndex(tileIndex)) return;
 
@@ -80,19 +89,22 @@ public:
     }
 
     void draw() const {
-        if (!tilemap) return;
-
-        const int tileset_cols = al_get_bitmap_width(this->tilemap) / this->tileSize;
         for (int y = 0; y < this->mapHeight; ++y) {
             for (int x = 0; x < this->mapWidth; ++x) {
                 const int tile_index = this->tiles[x][y];
                 if (tile_index < 0) continue;
 
-                const float sx = static_cast<float>(tile_index % tileset_cols) * this->tileSize;
-                const float sy = static_cast<float>(tile_index / tileset_cols) * this->tileSize;
-                const float dx = x * this->tileSize;
-                const float dy = y * this->tileSize;
-                al_draw_bitmap_region(this->tilemap, sx, sy, this->tileSize, this->tileSize, dx, dy, 0);
+                const float sx = static_cast<float>(tile_index % GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
+                const float sy = static_cast<float>(tile_index / GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
+                const float dx = x * GlobalSprites::TILE_SIZE;
+                const float dy = y * GlobalSprites::TILE_SIZE;
+                al_draw_bitmap_region(
+                    GlobalSprites::spritesheet,
+                    sx, sy,
+                    GlobalSprites::TILE_SIZE, GlobalSprites::TILE_SIZE,
+                    dx, dy,
+                    0
+                );
             }
         }
     }

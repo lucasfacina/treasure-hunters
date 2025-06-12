@@ -7,13 +7,13 @@
 #include <allegro5/keyboard.h>
 #include <allegro5/system.h>
 
+#include "sprites.h"
 #include "game_manager.h"
 
 #define MAP_WIDTH       50
 #define MAP_HEIGHT      30
-#define TILE_SIZE       16
-#define SCREEN_WIDTH    (TILE_SIZE * MAP_WIDTH)
-#define SCREEN_HEIGHT   (TILE_SIZE * MAP_HEIGHT)
+#define SCREEN_WIDTH    (16 * MAP_WIDTH)
+#define SCREEN_HEIGHT   (16 * MAP_HEIGHT)
 #define FPS             60
 
 using namespace std;
@@ -72,9 +72,12 @@ void registerEventSources() {
 }
 
 void updateAndDraw() {
+    GlobalSprites::spritesheet = al_load_bitmap("assets/spritesheet.png");
+    GlobalSprites::TILE_COLS = al_get_bitmap_width(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
+
     bool stopRunning = false;
     bool shouldRender = true;
-    game_manager = make_shared<GameManager>(MAP_WIDTH, MAP_HEIGHT, TILE_SIZE);
+    game_manager = make_shared<GameManager>(MAP_WIDTH, MAP_HEIGHT);
     ALLEGRO_KEYBOARD_STATE key_state;
 
     while (!stopRunning) {
@@ -107,6 +110,7 @@ void destroyPointers() {
     al_destroy_timer(timer);
     al_destroy_event_queue(event_queue);
     al_destroy_display(display);
+    al_destroy_bitmap(GlobalSprites::spritesheet);
 }
 
 int main(int argc, char **argv) {

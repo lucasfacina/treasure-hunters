@@ -11,10 +11,9 @@ class GameManager {
 public:
     GameManager(
         const int mapWidth,
-        const int mapHeight,
-        const int tileSize
+        const int mapHeight
     ) {
-        this->map_manager = std::make_shared<MapManager>(mapWidth, mapHeight, tileSize);
+        this->map_manager = std::make_shared<MapManager>(mapWidth, mapHeight);
 
         this->map_manager->addLayer("assets/mapa_fundo_grama.csv");
         this->map_manager->addLayer("assets/mapa_borda_floresta.csv");
@@ -28,14 +27,16 @@ public:
 
         this->player1 = std::make_shared<Player>(
             al_load_bitmap("assets/player1.png"),
-            MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
-            8 * tileSize, 3 * tileSize
+            MovimentKeyMap{ALLEGRO_KEY_W, ALLEGRO_KEY_S, ALLEGRO_KEY_A, ALLEGRO_KEY_D},
+            8, 3,
+            this->map_manager->getGameObjects()
         );
 
         this->player2 = std::make_shared<Player>(
             al_load_bitmap("assets/player2.png"),
-            MovimentKeyMap{ALLEGRO_KEY_W, ALLEGRO_KEY_S, ALLEGRO_KEY_A, ALLEGRO_KEY_D},
-            41 * tileSize, 3 * tileSize
+            MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
+            41, 3,
+            this->map_manager->getGameObjects()
         );
     }
 
