@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <format>
 #include <iomanip>
+#include <sstream>
 
 #include "../utils/layer.h"
 #include "objects/game_object.h"
