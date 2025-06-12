@@ -1,6 +1,7 @@
 #ifndef MAP_MANAGER_H
 #define MAP_MANAGER_H
 #include <vector>
+#include<algorithm>
 
 #include "../utils/layer.h"
 #include "objects/game_object.h"

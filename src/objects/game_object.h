@@ -1,6 +1,7 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 #include <iostream>
+#include <memory>
 #include <allegro5/bitmap_draw.h>
 #include <allegro5/events.h>
 #include <allegro5/keyboard.h>
