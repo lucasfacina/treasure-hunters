@@ -94,7 +94,7 @@ void registerEventSources() {
 }
 
 void updateAndDraw() {
-    Settings::spritesheet = al_load_bitmap("assets/spritesheet.png");
+    Settings::spritesheet = al_load_bitmap(asset("spritesheet.png"));
     Settings::TILE_COLS = al_get_bitmap_width(Settings::spritesheet) / Settings::TILE_SIZE;
 
     bool stopRunning = false;

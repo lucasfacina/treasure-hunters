@@ -2,6 +2,7 @@
 #define GAME_MANAGER_H
 #include "map_manager.h"
 #include "../objects/player.h"
+#include "utils/assets.h"
 
 class GameManager {
     std::shared_ptr<MapManager> map_manager;
@@ -12,24 +13,24 @@ public:
     GameManager() {
         this->map_manager = std::make_shared<MapManager>();
 
-        this->map_manager->addLayer("../assets/mapa_fundo_grama.csv");
-        this->map_manager->addLayer("../assets/mapa_borda_floresta.csv");
-        this->map_manager->addLayer("../assets/mapa_caminho.csv");
-        this->map_manager->addLayer("../assets/mapa_nascente_agua.csv");
-        this->map_manager->addLayer("../assets/mapa_pedras_arbustos.csv");
-        this->map_manager->addLayer("../assets/mapa_agua.csv");
-        this->map_manager->addLayer("../assets/mapa_pontes.csv");
-        this->map_manager->addLayer("../assets/mapa_casas.csv");
-        this->map_manager->addLayer("../assets/mapa_tesouros.csv");
+        this->map_manager->addLayer(asset("mapa_fundo_grama.csv"));
+        this->map_manager->addLayer(asset("mapa_borda_floresta.csv"));
+        this->map_manager->addLayer(asset("mapa_caminho.csv"));
+        this->map_manager->addLayer(asset("mapa_nascente_agua.csv"));
+        this->map_manager->addLayer(asset("mapa_pedras_arbustos.csv"));
+        this->map_manager->addLayer(asset("mapa_agua.csv"));
+        this->map_manager->addLayer(asset("mapa_pontes.csv"));
+        this->map_manager->addLayer(asset("mapa_casas.csv"));
+        this->map_manager->addLayer(asset("mapa_tesouros.csv"));
 
         this->player1 = std::make_shared<Player>(
-            al_load_bitmap("../assets/player1.png"),
+            al_load_bitmap(asset("player1.png")),
             MovimentKeyMap{ALLEGRO_KEY_W, ALLEGRO_KEY_S, ALLEGRO_KEY_A, ALLEGRO_KEY_D},
             8, 3,
             this->map_manager->getGameObjects());
 
         this->player2 = std::make_shared<Player>(
-            al_load_bitmap("../assets/player2.png"),
+            al_load_bitmap(asset("player2.png")),
             MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
             41, 3,
             this->map_manager->getGameObjects());
