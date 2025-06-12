@@ -1,12 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include <format>
 #include <allegro5/bitmap.h>
 #include <allegro5/events.h>
 
 #include "game_object.h"
 
-#define PLAYER_SPEED 1
+#define PLAYER_SPEED 1 // tile per update
 
 struct MovimentKeyMap {
     int up;
@@ -28,28 +27,31 @@ class Player final : public GameObject {
     bool check_collision(
         const int targetX,
         const int targetY) override {
-        // for (const auto &obj: gameObj) {
-        // if (obj == holdingTreasureItem) continue; // Não colidiu com o próprio tesouro que está sendo segurado
-        // if (nextX != obj->getX() && nextY != obj->getY()) continue; // Não há colisão com este objeto
+        bool collision = false;
 
-        // if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
-        // if (holdingTreasureItem == nullptr) {
-        // holdingTreasureItem = treasure;
-        // return false; // Colisão com o tesouro, o jogador ficará em cima dele
-        // }
+        for (const auto &obj: this->mapManager->findGameObjectsAt(targetX, targetY)) {
+            if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
+                if (holdingTreasureItem == nullptr)
+                    holdingTreasureItem = treasure;
 
-        // if (std::dynamic_pointer_cast<ChestObject>(obj) && holdingTreasureItem != nullptr) {
-        // std::cout << "Guardou o tesouro" << std::endl;
-        // holdingTreasureItem = nullptr;
-        // return true; // Colisão com o baú, o jogador guarda o tesouro
-        // }
-        // }
+            if (const auto chest = std::dynamic_pointer_cast<ChestObject>(obj)) {
+                if (holdingTreasureItem != nullptr)
+                    this->saveTreasureItem(chest);
+                collision = true;
+            }
 
-        // for (const auto &obj: gameObj) {
+            if (std::dynamic_pointer_cast<CollidableObject>(obj))
+                collision = true;
+        }
 
-        // return true; // Colisão com outro objeto
-        // }
-        return false; // Não há colisão com nenhum objeto
+        return collision;
+    }
+
+    void saveTreasureItem(const std::shared_ptr<ChestObject> &chest) {
+        if (chest == nullptr) return;
+
+        std::cout << "Guardou o tesouro!" << std::endl;
+        holdingTreasureItem = nullptr;
     }
 
     void update_position() {
@@ -62,8 +64,6 @@ class Player final : public GameObject {
         if (keyRight) this->move(PLAYER_SPEED, 0.0f);
 
         if (oldX == this->x && oldY == this->y) return;
-
-        std::cout << std::format("Player: ({} -> {}, {} -> {})", oldX, this->x, oldY, this->y) << std::endl;
 
         if (holdingTreasureItem != nullptr)
             holdingTreasureItem->move(this->x, this->y);
@@ -78,7 +78,8 @@ public:
         : GameObject(-1, startX, startY)
           , sprite(sprite)
           , keyMap(keyMap)
-          , holdingTreasureItem(nullptr) {}
+          , holdingTreasureItem(nullptr) {
+    }
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
         if (event->type != ALLEGRO_EVENT_TIMER) return;
