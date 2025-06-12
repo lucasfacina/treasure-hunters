@@ -94,7 +94,7 @@ public:
     }
 
     void draw() const override {
-        al_draw_bitmap(this->sprite, x * GlobalSprites::TILE_SIZE, y * GlobalSprites::TILE_SIZE, 0);
+        al_draw_bitmap(this->sprite, x * Settings::TILE_SIZE, y * Settings::TILE_SIZE, 0);
     }
 };
 

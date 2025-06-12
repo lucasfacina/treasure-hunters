@@ -70,10 +70,8 @@ public:
     }
 
     bool isValidTileIndex(const int tileIndex) const {
-        auto teste = GlobalSprites::spritesheet;
-
-        const int tileset_cols = al_get_bitmap_width(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
-        const int tileset_rows = al_get_bitmap_height(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
+        const int tileset_cols = al_get_bitmap_width(Settings::spritesheet) / Settings::TILE_SIZE;
+        const int tileset_rows = al_get_bitmap_height(Settings::spritesheet) / Settings::TILE_SIZE;
         return tileIndex >= -1 && tileIndex < tileset_cols * tileset_rows;
     }
 
@@ -94,14 +92,14 @@ public:
                 const int tile_index = this->tiles[x][y];
                 if (tile_index < 0) continue;
 
-                const float sx = static_cast<float>(tile_index % GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
-                const float sy = static_cast<float>(tile_index / GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
-                const float dx = x * GlobalSprites::TILE_SIZE;
-                const float dy = y * GlobalSprites::TILE_SIZE;
+                const float sx = static_cast<float>(tile_index % Settings::TILE_COLS) * Settings::TILE_SIZE;
+                const float sy = static_cast<float>(tile_index / Settings::TILE_COLS) * Settings::TILE_SIZE;
+                const float dx = x * Settings::TILE_SIZE;
+                const float dy = y * Settings::TILE_SIZE;
                 al_draw_bitmap_region(
-                    GlobalSprites::spritesheet,
+                    Settings::spritesheet,
                     sx, sy,
-                    GlobalSprites::TILE_SIZE, GlobalSprites::TILE_SIZE,
+                    Settings::TILE_SIZE, Settings::TILE_SIZE,
                     dx, dy,
                     0
                 );

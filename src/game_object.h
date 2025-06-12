@@ -57,15 +57,15 @@ public:
     virtual void draw() const {
         if (!selfRender) return;
 
-        const float sx = static_cast<float>(tileId % GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
-        const float sy = static_cast<float>(tileId / GlobalSprites::TILE_COLS) * GlobalSprites::TILE_SIZE;
-        const float dx = x * GlobalSprites::TILE_SIZE;
-        const float dy = y * GlobalSprites::TILE_SIZE;
+        const float sx = static_cast<float>(tileId % Settings::TILE_COLS) * Settings::TILE_SIZE;
+        const float sy = static_cast<float>(tileId / Settings::TILE_COLS) * Settings::TILE_SIZE;
+        const float dx = x * Settings::TILE_SIZE;
+        const float dy = y * Settings::TILE_SIZE;
 
         al_draw_bitmap_region(
-            GlobalSprites::spritesheet,
+            Settings::spritesheet,
             sx, sy,
-            GlobalSprites::TILE_SIZE, GlobalSprites::TILE_SIZE,
+            Settings::TILE_SIZE, Settings::TILE_SIZE,
             dx, dy,
             0
         );

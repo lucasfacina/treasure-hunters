@@ -1,5 +1,4 @@
 // --- CONFIGURAÇÕES GERAIS ---
-#include <cstdio>
 #include <memory>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
@@ -72,8 +71,8 @@ void registerEventSources() {
 }
 
 void updateAndDraw() {
-    GlobalSprites::spritesheet = al_load_bitmap("assets/spritesheet.png");
-    GlobalSprites::TILE_COLS = al_get_bitmap_width(GlobalSprites::spritesheet) / GlobalSprites::TILE_SIZE;
+    Settings::spritesheet = al_load_bitmap("assets/spritesheet.png");
+    Settings::TILE_COLS = al_get_bitmap_width(Settings::spritesheet) / Settings::TILE_SIZE;
 
     bool stopRunning = false;
     bool shouldRender = true;
