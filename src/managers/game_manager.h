@@ -19,7 +19,6 @@ public:
         this->map_manager->addLayer(asset("mapa_nascente_agua.csv"));
         this->map_manager->addLayer(asset("mapa_pedras_arbustos.csv"));
         this->map_manager->addLayer(asset("mapa_agua.csv"));
-        this->map_manager->addLayer(asset("mapa_pontes.csv"));
         this->map_manager->addLayer(asset("mapa_casas.csv"));
         this->map_manager->addLayer(asset("mapa_tesouros.csv"));
 
