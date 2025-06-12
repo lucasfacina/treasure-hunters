@@ -96,8 +96,6 @@ public:
     }
 
     void moveGameObject(const std::shared_ptr<GameObject> &gameObject, int newX, int newY) {
-        std::cout << "Movendo para: (" << newX << ", " << newY << ")" << std::endl;
-
         Position oldPos = {gameObject->getX(), gameObject->getY()};
 
         // Remover o ponteiro do GameObject da lista da posição antiga
