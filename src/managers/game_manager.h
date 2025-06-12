@@ -35,6 +35,8 @@ public:
             MovimentKeyMap{ALLEGRO_KEY_UP, ALLEGRO_KEY_DOWN, ALLEGRO_KEY_LEFT, ALLEGRO_KEY_RIGHT},
             41, 3);
         this->player2->injectMapManager(map_manager);
+
+        this->map_manager->updateScore();
     }
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) const {

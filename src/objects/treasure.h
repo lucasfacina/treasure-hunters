@@ -14,6 +14,8 @@ public:
         : GameObject(tileId, startX, startY)
           , value(value) {
     }
+
+    [[nodiscard]] int getValue() const { return value; }
 };
 
 #endif //TREASURE_OBJECT_H

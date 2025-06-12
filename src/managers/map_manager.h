@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <format>
+#include <iomanip>
 
 #include "../utils/layer.h"
 #include "objects/game_object.h"
@@ -20,6 +22,8 @@ class MapManager final : public std::enable_shared_from_this<MapManager> {
     std::unordered_map<Position, std::vector<std::shared_ptr<GameObject> >, PositionHash> gameObjectsByPosition;
 
     std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject> > > houseSlotByPlayerType;
+
+    std::array<std::string, COUNT> scoreByPlayerType;
 
     void loadLayer(const std::shared_ptr<Layer> &layer, const char *filename) {
         FILE *file = fopen(filename, "r");
@@ -132,10 +136,28 @@ public:
 
             slot->store(tresure);
             this->moveGameObject(tresure, slot->getX(), slot->getY());
+            this->updateScore();
             return true;
         }
 
         return false;
+    }
+
+    void updateScore() {
+        std::ostringstream formated_score;
+        for (const auto &[type, slots]: houseSlotByPlayerType) {
+            int score = 0;
+
+            for (const auto &slot: slots)
+                if (const auto treasure = slot->getStoredTresureItem())
+                    score += treasure->getValue();
+
+            formated_score << std::setfill('0') << std::setw(6) << score;
+
+            this->scoreByPlayerType[type] = formated_score.str();
+            formated_score.str("");
+            formated_score.clear();
+        }
     }
 
     const std::vector<std::shared_ptr<GameObject> > &getAllGameObjects() const {
@@ -153,14 +175,14 @@ public:
         constexpr auto yPadding = 0.5F;
 
         drawText(
-            "Score: xxx",
+            std::format("Score: {}", this->scoreByPlayerType[BLUE]).c_str(),
             xPadding, yPadding,
             al_map_rgb(224, 243, 242),
             al_map_rgb(13, 27, 54)
         );
 
         drawText(
-            "Score: xxx",
+            std::format("Score: {}", this->scoreByPlayerType[PINK]).c_str(),
             Settings::MAP_WIDTH - xPadding, yPadding,
             al_map_rgb(251, 223, 229),
             al_map_rgb(54, 4, 33)
