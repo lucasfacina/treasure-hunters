@@ -8,23 +8,23 @@
 #include "../objects/treasure.h"
 
 inline std::shared_ptr<GameObject> createById(const int id, const int x, const int y) {
-    const bool floresta_borda = (id >= 0 && id < 4) ||
-                                (id >= 17 && id < 21) ||
-                                (id >= 34 && id < 38) ||
-                                (id >= 51 && id < 55) ||
-                                (id >= 68 && id < 72);
+    const bool floresta_borda = (id >= 0 && id <= 4) ||
+                                (id >= 17 && id <= 21) ||
+                                (id >= 34 && id <= 38) ||
+                                (id >= 51 && id <= 55) ||
+                                (id >= 68 && id <= 72);
 
-    const bool decoracao = (id >= 143 && id < 148) ||
-                           (id >= 160 && id < 165) ||
-                           (id >= 177 && id < 182) ||
-                           (id >= 194 && id < 199) || id == 32;
+    const bool decoracao = (id >= 143 && id <= 148) ||
+                           (id >= 160 && id <= 165) ||
+                           (id >= 177 && id <= 182) ||
+                           (id >= 194 && id <= 199) || id == 32;
 
-    const bool casa = (id >= 7 && id < 14) || id == 28;
+    const bool casa = (id >= 7 && id <= 14) || id == 28;
 
-    const bool agua = (id >= 255 && id < 260) ||
-                      (id >= 272 && id < 277) ||
-                      (id >= 289 && id < 292) ||
-                      (id >= 306 && id < 309);
+    const bool agua = (id >= 255 && id <= 260) ||
+                      (id >= 272 && id <= 277) ||
+                      (id >= 289 && id <= 292) ||
+                      (id >= 306 && id <= 309);
 
     if (floresta_borda || casa || decoracao || agua)
         return std::make_shared<CollidableObject>(x, y);
