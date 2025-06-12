@@ -1,9 +1,9 @@
 #ifndef HOUSE_SLOT_H
 #define HOUSE_SLOT_H
-#include "game_object.h"
+#include "collidable.h"
 #include "utils/player_type.h"
 
-class HouseSlotObject final : public GameObject {
+class HouseSlotObject final : public CollidableObject {
     PlayerType playerType;
     std::shared_ptr<TreasureObject> storedTreasureItem;
 
@@ -11,7 +11,7 @@ public:
     explicit HouseSlotObject(
         const PlayerType playerType,
         const int x, const int y)
-        : GameObject(x, y)
+        : CollidableObject(x, y)
           , playerType(playerType) {
     }
 

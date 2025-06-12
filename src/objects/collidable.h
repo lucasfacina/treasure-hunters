@@ -2,7 +2,7 @@
 #define COLLIDABLE_OBJECT_H
 #include "game_object.h"
 
-class CollidableObject final : public GameObject {
+class CollidableObject : public GameObject {
 public:
     explicit CollidableObject(const int x, const int y)
         : GameObject(x, y) {
