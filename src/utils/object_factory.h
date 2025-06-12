@@ -17,9 +17,10 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
     const bool decoracao = (id >= 143 && id <= 148) ||
                            (id >= 160 && id <= 165) ||
                            (id >= 177 && id <= 182) ||
-                           (id >= 194 && id <= 199) || id == 32;
+                           (id >= 194 && id <= 199) ||
+                           id == 25 || id == 32;
 
-    const bool casa = (id >= 7 && id <= 14) || id == 28;
+    const bool casa = (id >= 7 && id <= 13) || (id >= 58 && id <= 64);
 
     const bool agua = (id >= 255 && id <= 260) ||
                       (id >= 272 && id <= 277) ||
@@ -31,6 +32,7 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
 
     switch (id) {
         case 27: return std::make_shared<ChestObject>(x, y);
+        case 44: return std::make_shared<ChestObject>(x, y);
 
         // Tesouros de Bronze
         case 278: return std::make_shared<TreasureObject>(id, 10, x, y); // Moeda
