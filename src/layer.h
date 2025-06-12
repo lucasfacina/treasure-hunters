@@ -6,7 +6,7 @@
 
 #include "game_object.h"
 #include "object_factory.h"
-#include "sprites.h"
+#include "settings.h"
 
 class Layer {
     int **tiles;

@@ -1,5 +1,5 @@
-#ifndef SPRITES_H
-#define SPRITES_H
+#ifndef SETTINGS_H
+#define SETTINGS_H
 #include <allegro5/bitmap.h>
 
 namespace Settings {
@@ -11,4 +11,4 @@ namespace Settings {
    inline ALLEGRO_BITMAP *spritesheet = nullptr;
 }
 
-#endif //SPRITES_H
+#endif //SETTINGS_H

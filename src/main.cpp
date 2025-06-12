@@ -6,7 +6,7 @@
 #include <allegro5/keyboard.h>
 #include <allegro5/system.h>
 
-#include "sprites.h"
+#include "settings.h"
 #include "game_manager.h"
 
 using namespace std;
