@@ -30,7 +30,9 @@ public:
         if (useSerial) {
             try {
                 arduino = std::make_unique<SerialPort>("", 9600);
-                std::cout << "Conexão serial estabelecida!" << std::endl;
+
+                if (arduino->isConnected())
+                    std::cout << "Conexão serial estabelecida!" << std::endl;
             } catch (const SerialException &e) {
                 std::cerr << "Erro ao conectar com Arduino: " << e.what() << std::endl;
                 std::cerr << "Voltando para controle por teclado..." << std::endl;

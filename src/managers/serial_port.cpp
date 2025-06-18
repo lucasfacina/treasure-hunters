@@ -35,6 +35,8 @@ std::string SerialPort::selectPortFromList() {
     }
 
     std::cout << "\nPortas encontradas:" << std::endl;
+    std::cout << "[0] Sair - Não utilizar porta serial" << std::endl;
+
     for (size_t i = 0; i < availablePorts.size(); ++i) {
         std::cout << "[" << (i + 1) << "] " << availablePorts[i] << std::endl;
     }
@@ -43,13 +45,18 @@ std::string SerialPort::selectPortFromList() {
     std::cout << "> ";
 
     int choice;
-    while (!(std::cin >> choice) || choice < 1 || choice > static_cast<int>(availablePorts.size())) {
-        std::cout << "Escolha inválida! Digite um número entre 1 e " << availablePorts.size() << ": ";
+    while (!(std::cin >> choice) || choice < 0 || choice > static_cast<int>(availablePorts.size())) {
+        std::cout << "Escolha inválida! Digite um número entre 0 e " << availablePorts.size() << ": ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpa o buffer
+
+    if (choice == 0) {
+        std::cout << "Nenhuma porta serial será utilizada." << std::endl;
+        return "";
+    }
 
     return availablePorts[choice - 1];
 }
@@ -61,6 +68,8 @@ SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
     if (port.empty()) {
         selectedPort = selectPortFromList();
     }
+
+    if (selectedPort.empty()) return;
 
     std::string portName = "\\\\.\\" + selectedPort;
     this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -158,7 +167,7 @@ std::vector<std::string> SerialPort::listAvailablePorts() {
         return ports;
     }
 
-    struct dirent *entry;
+    dirent *entry;
     while ((entry = readdir(dir)) != nullptr) {
         std::string name = entry->d_name;
 
@@ -191,6 +200,8 @@ std::string SerialPort::selectPortFromList() {
     }
 
     std::cout << "\nPortas encontradas:" << std::endl;
+    std::cout << "[0] Sair - Não utilizar porta serial" << std::endl;
+
     for (size_t i = 0; i < availablePorts.size(); ++i) {
         std::cout << "[" << (i + 1) << "] " << availablePorts[i] << std::endl;
     }
@@ -199,13 +210,18 @@ std::string SerialPort::selectPortFromList() {
     std::cout << "> ";
 
     int choice;
-    while (!(std::cin >> choice) || choice < 1 || choice > static_cast<int>(availablePorts.size())) {
-        std::cout << "Escolha inválida! Digite um número entre 1 e " << availablePorts.size() << ": ";
+    while (!(std::cin >> choice) || choice < 0 || choice > static_cast<int>(availablePorts.size())) {
+        std::cout << "Escolha inválida! Digite um número entre 0 e " << availablePorts.size() << ": ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpa o buffer
+
+    if (choice == 0) {
+        std::cout << "Nenhuma porta serial será utilizada." << std::endl;
+        return "";
+    }
 
     return availablePorts[choice - 1];
 }
@@ -217,6 +233,8 @@ SerialPort::SerialPort(const std::string &port, unsigned int baudRate) {
     if (port.empty()) {
         selectedPort = selectPortFromList();
     }
+
+    if (selectedPort.empty()) return;
 
     this->fd = open(selectedPort.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
