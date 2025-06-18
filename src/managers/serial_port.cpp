@@ -7,6 +7,9 @@
 // ======================================================================
 #ifdef _WIN32
 #include <windows.h>
+#include <clocale>
+
+
 
 std::vector<std::string> SerialPort::listAvailablePorts() {
     std::vector<std::string> ports;
@@ -62,6 +65,9 @@ std::string SerialPort::selectPortFromList() {
 }
 
 SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
+
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+
     std::string selectedPort = port;
 
     // Se o port estiver vazio ou for nullptr, lista as portas disponíveis
@@ -127,7 +133,7 @@ SerialPort::~SerialPort() {
     }
 }
 
-std::string SerialPort::readLine() {
+std::string SerialPort::readLine() const {
     if (!this->connected) return "";
 
     std::string line;
