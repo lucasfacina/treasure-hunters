@@ -12,6 +12,10 @@ struct MovimentKeyMap {
     int down;
     int left;
     int right;
+    char serialUp;
+    char serialDown;
+    char serialLeft;
+    char serialRight;
 };
 
 class Player final : public GameObject {
@@ -20,6 +24,7 @@ class Player final : public GameObject {
     std::shared_ptr<TreasureObject> holdingTreasureItem;
 
     PlayerType type;
+    char serialCommand = '0';
 
     bool keyUp{false};
     bool keyDown{false};
@@ -67,6 +72,10 @@ class Player final : public GameObject {
             holdingTreasureItem->move(this->x - oldX, this->y - oldY);
     }
 
+    bool isKeyActive(const ALLEGRO_KEYBOARD_STATE *key_state, int keyboardKey, char serialKey) const {
+        return al_key_down(key_state, keyboardKey) || (serialCommand != '0' && serialCommand == serialKey);
+    }
+
 public:
     explicit Player(
         PlayerType type,
@@ -78,16 +87,17 @@ public:
           , type(type)
           , sprite(sprite)
           , keyMap(keyMap)
-          , holdingTreasureItem(nullptr) {
-    }
+          , holdingTreasureItem(nullptr) {}
+
+    void setSerialCommand(char command) { serialCommand = command; }
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
         if (event->type != ALLEGRO_EVENT_TIMER) return;
 
-        this->keyUp = al_key_down(key_state, keyMap.up);
-        this->keyDown = al_key_down(key_state, keyMap.down);
-        this->keyLeft = al_key_down(key_state, keyMap.left);
-        this->keyRight = al_key_down(key_state, keyMap.right);
+        this->keyUp = isKeyActive(key_state, keyMap.up, keyMap.serialUp);
+        this->keyDown = isKeyActive(key_state, keyMap.down, keyMap.serialDown);
+        this->keyLeft = isKeyActive(key_state, keyMap.left, keyMap.serialLeft);
+        this->keyRight = isKeyActive(key_state, keyMap.right, keyMap.serialRight);
 
         this->update_position();
     }
