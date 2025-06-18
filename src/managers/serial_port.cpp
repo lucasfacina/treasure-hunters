@@ -1,4 +1,6 @@
 #include "serial_port.h"
+#include <iostream>
+#include <limits>
 
 // ======================================================================
 // IMPLEMENTAÇÃO PARA WINDOWS
@@ -6,12 +8,77 @@
 #ifdef _WIN32
 #include <windows.h>
 
+std::vector<std::string> SerialPort::listAvailablePorts() {
+    std::vector<std::string> ports;
+
+    // Tenta acessar portas COM de 1 a 20
+    for (int i = 1; i <= 20; ++i) {
+        std::string portName = "COM" + std::to_string(i);
+        std::string fullPortName = "\\\\.\\" + portName;
+
+        HANDLE hSerial = CreateFile(fullPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+        if (hSerial != INVALID_HANDLE_VALUE) {
+            ports.push_back(portName);
+            CloseHandle(hSerial);
+        }
+    }
+
+    return ports;
+}
+
+std::string SerialPort::selectPortFromList() {
+    std::vector<std::string> availablePorts = listAvailablePorts();
+
+    if (availablePorts.empty()) {
+        throw SerialException("Nenhuma porta serial foi encontrada!");
+    }
+
+    std::cout << "\nPortas encontradas:" << std::endl;
+    for (size_t i = 0; i < availablePorts.size(); ++i) {
+        std::cout << "[" << (i + 1) << "] " << availablePorts[i] << std::endl;
+    }
+
+    std::cout << "\nQual porta deseja utilizar?" << std::endl;
+    std::cout << "> ";
+
+    int choice;
+    while (!(std::cin >> choice) || choice < 1 || choice > static_cast<int>(availablePorts.size())) {
+        std::cout << "Escolha inválida! Digite um número entre 1 e " << availablePorts.size() << ": ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpa o buffer
+
+    return availablePorts[choice - 1];
+}
+
 SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
-    std::string portName = "\\\\.\\" + port;
+    std::string selectedPort = port;
+
+    // Se o port estiver vazio ou for nullptr, lista as portas disponíveis
+    if (port.empty()) {
+        selectedPort = selectPortFromList();
+    }
+
+    std::string portName = "\\\\.\\" + selectedPort;
     this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (this->hSerial == INVALID_HANDLE_VALUE) {
-        throw SerialException("Erro ao abrir a porta serial: " + port);
+        // Se falhar e o port original não estava vazio, tenta listar as portas
+        if (!port.empty()) {
+            std::cout << "Erro ao conectar com a porta: " << port << std::endl;
+            selectedPort = selectPortFromList();
+            portName = "\\\\.\\" + selectedPort;
+            this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+            if (this->hSerial == INVALID_HANDLE_VALUE) {
+                throw SerialException("Erro ao abrir a porta serial: " + selectedPort);
+            }
+        } else {
+            throw SerialException("Erro ao abrir a porta serial: " + selectedPort);
+        }
     }
 
     DCB dcbSerialParams = {0};
@@ -80,12 +147,92 @@ std::string SerialPort::readLine() {
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
+
+std::vector<std::string> SerialPort::listAvailablePorts() {
+    std::vector<std::string> ports;
+
+    DIR *dir = opendir("/dev");
+    if (dir == nullptr) {
+        return ports;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        std::string name = entry->d_name;
+
+        // Filtrar portas seriais típicas no Linux/macOS
+        if (name.find("ttyUSB") == 0 ||
+            name.find("ttyACM") == 0 ||
+            name.find("tty.usbmodem") == 0 ||
+            name.find("tty.usbserial") == 0 ||
+            name.find("cu.usbmodem") == 0 ||
+            name.find("cu.usbserial") == 0) {
+            std::string fullPath = "/dev/" + name;
+
+            // Verifica se é um dispositivo de caractere válido
+            struct stat st{};
+            if (stat(fullPath.c_str(), &st) == 0 && S_ISCHR(st.st_mode)) {
+                ports.push_back(fullPath);
+            }
+        }
+    }
+
+    closedir(dir);
+    return ports;
+}
+
+std::string SerialPort::selectPortFromList() {
+    std::vector<std::string> availablePorts = listAvailablePorts();
+
+    if (availablePorts.empty()) {
+        throw SerialException("Nenhuma porta serial foi encontrada!");
+    }
+
+    std::cout << "\nPortas encontradas:" << std::endl;
+    for (size_t i = 0; i < availablePorts.size(); ++i) {
+        std::cout << "[" << (i + 1) << "] " << availablePorts[i] << std::endl;
+    }
+
+    std::cout << "\nQual porta deseja utilizar?" << std::endl;
+    std::cout << "> ";
+
+    int choice;
+    while (!(std::cin >> choice) || choice < 1 || choice > static_cast<int>(availablePorts.size())) {
+        std::cout << "Escolha inválida! Digite um número entre 1 e " << availablePorts.size() << ": ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpa o buffer
+
+    return availablePorts[choice - 1];
+}
 
 SerialPort::SerialPort(const std::string &port, unsigned int baudRate) {
-    this->fd = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    std::string selectedPort = port;
+
+    // Se o port estiver vazio, lista as portas disponíveis
+    if (port.empty()) {
+        selectedPort = selectPortFromList();
+    }
+
+    this->fd = open(selectedPort.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
     if (this->fd == -1) {
-        throw SerialException("Erro ao abrir a porta serial: " + port);
+        // Se falhar e o port original não estava vazio, tenta listar as portas
+        if (!port.empty()) {
+            std::cout << "Erro ao conectar com a porta: " << port << std::endl;
+            selectedPort = selectPortFromList();
+            this->fd = open(selectedPort.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+
+            if (this->fd == -1) {
+                throw SerialException("Erro ao abrir a porta serial: " + selectedPort);
+            }
+        } else {
+            throw SerialException("Erro ao abrir a porta serial: " + selectedPort);
+        }
     }
 
     termios options{};

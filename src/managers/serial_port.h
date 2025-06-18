@@ -2,6 +2,7 @@
 #define SERIAL_PORT_H
 
 #include <string>
+#include <vector>
 #include <stdexcept>
 
 // Exceção customizada para erros de serial
@@ -25,6 +26,10 @@ public:
     [[nodiscard]] bool isConnected() const;
 
 private:
+    static std::vector<std::string> listAvailablePorts();
+
+    static std::string selectPortFromList();
+
     // Detalhes de implementação escondidos do usuário da classe
     // Variáveis específicas de cada SO serão declaradas aqui
     bool connected = false;

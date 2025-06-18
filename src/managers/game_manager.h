@@ -6,19 +6,6 @@
 #include "serial_port.h"
 #include <iostream>
 
-inline std::string getArduinoPort() {
-    // std::string port;
-    // do {
-    //     std::cout << "Conecte o Arduino e insira a porta: " << std::endl;
-    //     std::cout << "\tWindows: geralmente COM3" << std::endl;
-    //     std::cout << "\tLinux: geralmente /dev/ttyACM0 ou /dev/ttyUSB0" << std::endl;
-    //     std::cout << "\tMacOS: geralmente /dev/tty.usbmodemXXXX" << std::endl;
-    //     std::getline(std::cin, port);
-    // } while (port.empty());
-    // return port;
-    return "COM3";
-}
-
 class GameManager {
     std::shared_ptr<MapManager> map_manager;
     std::shared_ptr<Player> player1;
@@ -42,7 +29,7 @@ public:
 
         if (useSerial) {
             try {
-                arduino = std::make_unique<SerialPort>(getArduinoPort(), 9600);
+                arduino = std::make_unique<SerialPort>("", 9600);
                 std::cout << "Conexão serial estabelecida!" << std::endl;
             } catch (const SerialException &e) {
                 std::cerr << "Erro ao conectar com Arduino: " << e.what() << std::endl;
