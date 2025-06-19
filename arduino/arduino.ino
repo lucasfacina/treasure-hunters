@@ -29,10 +29,10 @@ char getPlayerAction(int xValue, int yValue, char upChar, char leftChar, char do
 
   // Verifica o eixo Y primeiro (Cima/Baixo)
   if (yValue > LIMIAR_SUPERIOR) {
-    return upChar;
+    return downChar;
   }
   if (yValue < LIMIAR_INFERIOR) {
-    return downChar;
+    return upChar;
   }
 
   // Se não for Cima/Baixo, verifica o eixo X (Esquerda/Direita)
