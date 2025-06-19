@@ -91,6 +91,12 @@ public:
         map_manager->draw();
         player1->draw();
         player2->draw();
+
+        if (useSerial && arduino && arduino->isConnected()) {
+            std::string command = arduino->readLine();
+            // Por algum motivo desenhar na tela melhora a leitura da portal serial
+            drawText(command.c_str(), -10, -10);
+        }
     }
 };
 
