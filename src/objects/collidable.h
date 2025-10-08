@@ -5,8 +5,7 @@
 class CollidableObject : public GameObject {
 public:
     explicit CollidableObject(const int x, const int y)
-        : GameObject(x, y) {
-    }
+        : GameObject(x, y) {}
 };
 
 #endif //COLLIDABLE_OBJECT_H

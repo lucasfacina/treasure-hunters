@@ -35,7 +35,7 @@ private:
     bool connected = false;
 
 #ifdef _WIN32
-    void* hSerial; // Usamos void* para não precisar incluir <windows.h> no header
+    void *hSerial; // Usamos void* para não precisar incluir <windows.h> no header
 #else
     int fd; // File descriptor para Linux/macOS
 #endif

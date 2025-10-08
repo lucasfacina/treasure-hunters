@@ -9,8 +9,6 @@
 #include <windows.h>
 #include <clocale>
 
-
-
 std::vector<std::string> SerialPort::listAvailablePorts() {
     std::vector<std::string> ports;
 
@@ -19,7 +17,8 @@ std::vector<std::string> SerialPort::listAvailablePorts() {
         std::string portName = "COM" + std::to_string(i);
         std::string fullPortName = "\\\\.\\" + portName;
 
-        HANDLE hSerial = CreateFile(fullPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hSerial = CreateFile(fullPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL, NULL);
 
         if (hSerial != INVALID_HANDLE_VALUE) {
             ports.push_back(portName);
@@ -64,8 +63,7 @@ std::string SerialPort::selectPortFromList() {
     return availablePorts[choice - 1];
 }
 
-SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
-
+SerialPort::SerialPort(const std::string &port, unsigned int baudRate) {
     setlocale(LC_ALL, "pt_BR.UTF-8");
 
     std::string selectedPort = port;
@@ -78,7 +76,8 @@ SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
     if (selectedPort.empty()) return;
 
     std::string portName = "\\\\.\\" + selectedPort;
-    this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                               FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (this->hSerial == INVALID_HANDLE_VALUE) {
         // Se falhar e o port original não estava vazio, tenta listar as portas
@@ -86,7 +85,8 @@ SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
             std::cout << "Erro ao conectar com a porta: " << port << std::endl;
             selectedPort = selectPortFromList();
             portName = "\\\\.\\" + selectedPort;
-            this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            this->hSerial = CreateFile(portName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                                       FILE_ATTRIBUTE_NORMAL, NULL);
 
             if (this->hSerial == INVALID_HANDLE_VALUE) {
                 throw SerialException("Erro ao abrir a porta serial: " + selectedPort);
@@ -117,7 +117,7 @@ SerialPort::SerialPort(const std::string& port, unsigned int baudRate) {
     timeouts.ReadIntervalTimeout = 50;
     timeouts.ReadTotalTimeoutConstant = 50;
     timeouts.ReadTotalTimeoutMultiplier = 10;
-    if(!SetCommTimeouts(this->hSerial, &timeouts)) {
+    if (!SetCommTimeouts(this->hSerial, &timeouts)) {
         CloseHandle(this->hSerial);
         throw SerialException("Erro ao configurar timeouts.");
     }

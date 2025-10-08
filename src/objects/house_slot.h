@@ -12,8 +12,7 @@ public:
         const PlayerType playerType,
         const int x, const int y)
         : CollidableObject(x, y)
-          , playerType(playerType) {
-    }
+          , playerType(playerType) {}
 
     bool isEmpty() const { return storedTreasureItem == nullptr; }
 

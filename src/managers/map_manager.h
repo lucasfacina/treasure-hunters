@@ -14,15 +14,15 @@
 #include "utils/position.h"
 
 class MapManager final : public std::enable_shared_from_this<MapManager> {
-    std::vector<std::shared_ptr<Layer> > layers;
+    std::vector<std::shared_ptr<Layer>> layers;
 
     // Estrutura para iteração rápida sobre todos os objetos
-    std::vector<std::shared_ptr<GameObject> > allGameObjects;
+    std::vector<std::shared_ptr<GameObject>> allGameObjects;
 
     // Estrutura para busca rápida por posição
-    std::unordered_map<Position, std::vector<std::shared_ptr<GameObject> >, PositionHash> gameObjectsByPosition;
+    std::unordered_map<Position, std::vector<std::shared_ptr<GameObject>>, PositionHash> gameObjectsByPosition;
 
-    std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject> > > houseSlotByPlayerType;
+    std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject>>> houseSlotByPlayerType;
 
     std::array<std::string, COUNT> scoreByPlayerType;
 
@@ -100,7 +100,7 @@ public:
         );
     }
 
-    std::vector<std::shared_ptr<GameObject> > findGameObjectsAt(int x, int y) {
+    std::vector<std::shared_ptr<GameObject>> findGameObjectsAt(int x, int y) {
         auto gameObjectsAtThePosition = gameObjectsByPosition.find({x, y});
         if (gameObjectsAtThePosition != gameObjectsByPosition.end())
             return gameObjectsAtThePosition->second;
@@ -161,7 +161,7 @@ public:
         }
     }
 
-    const std::vector<std::shared_ptr<GameObject> > &getAllGameObjects() const {
+    const std::vector<std::shared_ptr<GameObject>> &getAllGameObjects() const {
         return allGameObjects;
     }
 

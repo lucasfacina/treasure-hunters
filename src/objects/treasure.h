@@ -12,8 +12,7 @@ public:
         const int startX,
         const int startY)
         : GameObject(tileId, startX, startY)
-          , value(value) {
-    }
+          , value(value) {}
 
     [[nodiscard]] int getValue() const { return value; }
 };

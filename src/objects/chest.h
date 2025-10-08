@@ -11,8 +11,7 @@ public:
         const PlayerType playerType,
         const int x, const int y)
         : GameObject(x, y)
-    , playerType(playerType){
-    }
+          , playerType(playerType) {}
 
     [[nodiscard]] PlayerType getType() const { return playerType; }
 };
