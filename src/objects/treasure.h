@@ -4,6 +4,7 @@
 
 class TreasureObject final : public GameObject {
     int value;
+    std::shared_ptr<GameObject> playerHolding;
 
 public:
     explicit TreasureObject(
@@ -12,9 +13,16 @@ public:
         const int startX,
         const int startY)
         : GameObject(tileId, startX, startY)
-          , value(value) {}
+          , value(value)
+          , playerHolding(nullptr) {}
 
     [[nodiscard]] int getValue() const { return value; }
+
+    [[nodiscard]] bool isHeld() const { return playerHolding != nullptr; }
+
+    void setHoldingBy(const std::shared_ptr<GameObject> &player) { playerHolding = player; }
+
+    void removeHolding() { playerHolding = nullptr; }
 };
 
 #endif //TREASURE_OBJECT_H

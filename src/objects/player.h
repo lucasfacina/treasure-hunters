@@ -38,8 +38,10 @@ class Player final : public GameObject {
 
         for (const auto &obj: this->mapManager->findGameObjectsAt(targetX, targetY)) {
             if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
-                if (holdingTreasureItem == nullptr)
+                if (holdingTreasureItem == nullptr && !treasure->isHeld()) {
+                    treasure->setHoldingBy(shared_from_this());
                     holdingTreasureItem = treasure;
+                }
 
             if (const auto chest = std::dynamic_pointer_cast<ChestObject>(obj)) {
                 if (holdingTreasureItem != nullptr)
@@ -55,8 +57,10 @@ class Player final : public GameObject {
     }
 
     void saveTreasureItem(const std::shared_ptr<ChestObject> &chest) {
-        if (this->mapManager->storeTreasure(holdingTreasureItem, chest))
+        if (this->mapManager->storeTreasure(holdingTreasureItem, chest)) {
+            holdingTreasureItem->removeHolding();
             holdingTreasureItem = nullptr;
+        }
     }
 
     void update_position() {
