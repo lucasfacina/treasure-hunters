@@ -109,9 +109,14 @@ public:
     }
 
     void moveGameObject(const std::shared_ptr<GameObject> &gameObject, int newX, int newY) {
-        Position oldPos = {gameObject->getX(), gameObject->getY()};
+        this->moveGameObject(
+            gameObject,
+            {gameObject->getX(), gameObject->getY()},
+            {newX, newY}
+        );
+    }
 
-        // Remover o ponteiro do GameObject da lista da posição antiga
+    void moveGameObject(const std::shared_ptr<GameObject> &gameObject, const Position &oldPos, const Position &newPos) {
         auto it = gameObjectsByPosition.find(oldPos);
         if (it != gameObjectsByPosition.end()) {
             auto &objects_at_old_pos = it->second;
@@ -125,9 +130,8 @@ public:
                 gameObjectsByPosition.erase(it);
         }
 
-        gameObject->setPosition(newX, newY);
+        gameObject->setPosition(newPos.x, newPos.y);
 
-        Position newPos = {newX, newY};
         gameObjectsByPosition[newPos].push_back(gameObject);
     }
 
@@ -136,7 +140,7 @@ public:
             if (!slot->isEmpty()) continue;
 
             slot->store(tresure);
-            this->moveGameObject(tresure, slot->getX(), slot->getY());
+            this->moveGameObject(tresure, tresure->getInitialPosition(), {slot->getX(), slot->getY()});
             this->updateScore();
             return true;
         }

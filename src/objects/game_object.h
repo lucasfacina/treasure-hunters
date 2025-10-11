@@ -39,7 +39,7 @@ public:
           , selfRender(true)
           , tileId(tileId) {}
 
-    void move(int offsetX, int offsetY);
+    virtual void move(int offsetX, int offsetY);
 
     void setPosition(const int newX, const int newY) {
         x = newX;

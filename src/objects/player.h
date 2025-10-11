@@ -37,6 +37,8 @@ class Player final : public GameObject {
         bool collision = false;
 
         for (const auto &obj: this->mapManager->findGameObjectsAt(targetX, targetY)) {
+            if (obj == holdingTreasureItem) continue;
+
             if (const auto treasure = std::dynamic_pointer_cast<TreasureObject>(obj))
                 if (holdingTreasureItem == nullptr && !treasure->isHeld()) {
                     treasure->setHoldingBy(shared_from_this());
