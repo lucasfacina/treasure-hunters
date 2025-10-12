@@ -43,6 +43,7 @@ public:
         screenStack.back()->onLoseFocus();
         screenStack.back()->onExit();
         screenStack.pop_back();
+        screenStack.back()->onFocus();
         return true;
     }
 
