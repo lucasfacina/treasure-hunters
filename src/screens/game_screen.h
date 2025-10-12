@@ -14,7 +14,7 @@ class GameScreen final : public Screen {
     std::shared_ptr<Player> pinkPlayer;
 
     std::unique_ptr<SerialPort> arduino;
-    bool useSerial;
+    bool useSerial = false; // TODO: Ler de .env
 
     void initializeSerial() {
         if (!useSerial) return;
@@ -32,12 +32,6 @@ class GameScreen final : public Screen {
     }
 
 public:
-    explicit GameScreen(const bool useSerial = false)
-        : useSerial(useSerial) {
-        initializeSerial();
-        startNewMatch();
-    }
-
     void startNewMatch() {
         this->map_manager = std::make_shared<MapManager>();
 
@@ -131,7 +125,10 @@ public:
         }
     }
 
-    void init() override { startNewMatch(); }
+    void init() override {
+        initializeSerial();
+        startNewMatch();
+    }
 
     void onFocus() override { startNewMatch(); }
 
