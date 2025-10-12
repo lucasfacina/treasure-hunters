@@ -25,6 +25,11 @@ file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/src/*.h")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
+# --- CONFIGURAÇÃO DO HTTPS ---
+#    Isso é o mesmo que colocar #define CPPHTTPLIB_OPENSSL_SUPPORT no topo do .cpp
+target_compile_definitions(${PROJECT_NAME} PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
+# --- FIM DA CONFIGURAÇÃO DO HTTPS ---
+
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${nlohmann_json_SOURCE_DIR}/include
         ${httplib_SOURCE_DIR}
@@ -32,11 +37,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 IF (WIN32)
     target_link_libraries(${PROJECT_NAME} mingw32 allegro_monolith-debug)
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+            OpenSSL::SSL
+            OpenSSL::Crypto
+    )
 else ()
     include_directories(/opt/homebrew/Cellar/allegro/5.2.10.1/include)
     link_directories(/opt/homebrew/Cellar/allegro/5.2.10.1/lib)
 
     file(GLOB LIBRARIES "/opt/homebrew/Cellar/allegro/5.2.10.1/lib/*.dylib")
+    find_package(OpenSSL REQUIRED)
 
-    target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
+    target_link_libraries(
+            ${PROJECT_NAME}
+            ${LIBRARIES}
+            OpenSSL::SSL
+            OpenSSL::Crypto
+    )
 ENDIF ()
