@@ -1,7 +1,7 @@
 #ifndef TRABALHO_TILEMAP_GAME_SCREEN_H
 #define TRABALHO_TILEMAP_GAME_SCREEN_H
 #include <iostream>
-
+#include <chrono>
 #include "screen.h"
 #include "utils/assets.h"
 #include "objects/player.h"
@@ -15,6 +15,8 @@ class GameScreen final : public Screen {
 
     std::unique_ptr<SerialPort> arduino;
     bool useSerial = false; // TODO: Ler de .env
+
+    std::chrono::steady_clock::time_point matchStartAt;
 
     void initializeSerial() {
         if (!useSerial) return;
@@ -33,6 +35,7 @@ class GameScreen final : public Screen {
 
 public:
     void startNewMatch() {
+        this->matchStartAt = std::chrono::steady_clock::now();
         this->map_manager = std::make_shared<MapManager>();
 
         this->map_manager->addLayer(asset("mapa_fundo_grama.csv"));
@@ -67,21 +70,7 @@ public:
         this->map_manager->updateScore();
     }
 
-    void checkMatchEndCondition() {
-        if (map_manager->getEmptySlotsCount() == 0) {
-            int blueScore = std::stoi(map_manager->getScore(BLUE));
-            int pinkScore = std::stoi(map_manager->getScore(PINK));
-
-            /*
-            if (blueScore > pinkScore) {
-                winner = BLUE;
-            } else if (pinkScore > blueScore) {
-                winner = PINK;
-            } else {
-                winner = std::nullopt;
-            }*/
-        }
-    }
+    void checkMatchEndCondition();
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
         if (al_key_down(key_state, ALLEGRO_KEY_R))
