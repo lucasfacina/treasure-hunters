@@ -165,6 +165,25 @@ public:
         }
     }
 
+    int getEmptySlotsCount() const {
+        int count = 0;
+        for (const auto &[type, slots]: houseSlotByPlayerType) {
+            for (const auto &slot: slots) {
+                if (slot->isEmpty()) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    std::string getScore(PlayerType type) const {
+        if (this->scoreByPlayerType[type].empty())
+            return "000000";
+
+        return scoreByPlayerType[type];
+    }
+
     const std::vector<std::shared_ptr<GameObject>> &getAllGameObjects() const {
         return allGameObjects;
     }
