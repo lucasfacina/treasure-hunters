@@ -26,6 +26,8 @@ class MapManager final : public std::enable_shared_from_this<MapManager> {
 
     std::array<std::string, COUNT> scoreByPlayerType;
 
+    int emptyHouseSlotsCount = 0;
+
     void loadLayer(const std::shared_ptr<Layer> &layer, const char *filename) {
         FILE *file = fopen(filename, "r");
         if (!file) {
@@ -74,6 +76,7 @@ public:
         this->loadLayer(new_layer, csv_map_file);
 
         this->layers.push_back(new_layer);
+        this->updateEmptySlotsCount();
     }
 
     void addGameObject(const std::shared_ptr<GameObject> &gameObject) {
@@ -141,6 +144,7 @@ public:
 
             slot->store(tresure);
             this->moveGameObject(tresure, tresure->getInitialPosition(), {slot->getX(), slot->getY()});
+            this->updateEmptySlotsCount();
             this->updateScore();
             return true;
         }
@@ -165,17 +169,16 @@ public:
         }
     }
 
-    int getEmptySlotsCount() const {
-        int count = 0;
-        for (const auto &[type, slots]: houseSlotByPlayerType) {
-            for (const auto &slot: slots) {
-                if (slot->isEmpty()) {
-                    count++;
-                }
-            }
-        }
-        return count;
+    void updateEmptySlotsCount() {
+        this->emptyHouseSlotsCount = 0;
+
+        for (const auto &[type, slots]: houseSlotByPlayerType)
+            for (const auto &slot: slots)
+                if (slot->isEmpty())
+                    this->emptyHouseSlotsCount++;
     }
+
+    int getEmptySlotsCount() const { return this->emptyHouseSlotsCount; }
 
     std::string getScore(PlayerType type) const {
         if (this->scoreByPlayerType[type].empty())
