@@ -3,7 +3,12 @@
 #include <allegro5/bitmap.h>
 #include <allegro5/events.h>
 
+#include "chest.h"
+#include "collidable.h"
 #include "game_object.h"
+#include "treasure.h"
+#include "managers/map_manager.h"
+#include "utils/player_type.h"
 
 #define PLAYER_SPEED 1 // tile per update
 
