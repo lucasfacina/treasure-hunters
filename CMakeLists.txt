@@ -20,6 +20,12 @@ FetchContent_MakeAvailable(nlohmann_json httplib)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+IF (WIN32)
+    set(ALLEGRO_ROOT "C:/Allegro")
+    include_directories("${ALLEGRO_ROOT}/include")
+    link_directories("${ALLEGRO_ROOT}/lib")
+ENDIF ()
+
 file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/src/*.h")
 
