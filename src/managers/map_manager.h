@@ -138,11 +138,15 @@ public:
         gameObjectsByPosition[newPos].push_back(gameObject);
     }
 
-    bool storeTreasure(const std::shared_ptr<TreasureObject> &tresure, const std::shared_ptr<ChestObject> &chest) {
+    bool storeTreasure(
+        const PlayerType depositedBy,
+        const std::shared_ptr<TreasureObject> &tresure,
+        const std::shared_ptr<ChestObject> &chest
+    ) {
         for (const auto &slot: houseSlotByPlayerType[chest->getType()]) {
             if (!slot->isEmpty()) continue;
 
-            slot->store(tresure);
+            slot->store(tresure, depositedBy);
             this->moveGameObject(tresure, tresure->getInitialPosition(), {slot->getX(), slot->getY()});
             this->updateEmptySlotsCount();
             this->updateScore();

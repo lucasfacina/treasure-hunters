@@ -64,7 +64,7 @@ class Player final : public GameObject {
     }
 
     void saveTreasureItem(const std::shared_ptr<ChestObject> &chest) {
-        if (this->mapManager->storeTreasure(holdingTreasureItem, chest)) {
+        if (this->mapManager->storeTreasure(this->type, holdingTreasureItem, chest)) {
             holdingTreasureItem->removeHolding();
             holdingTreasureItem = nullptr;
         }
