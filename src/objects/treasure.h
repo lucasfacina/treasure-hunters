@@ -4,6 +4,7 @@
 #include "utils/position.h"
 
 class TreasureObject final : public GameObject {
+    std::string itemId;
     int value;
 
     Position initialPosition;
@@ -12,11 +13,13 @@ class TreasureObject final : public GameObject {
 
 public:
     explicit TreasureObject(
+        const std::string itemId,
         const int tileId,
         const int value,
         const int startX,
         const int startY)
         : GameObject(tileId, startX, startY)
+          , itemId(std::move(itemId))
           , value(value)
           , initialPosition({startX, startY})
           , playerHolding(nullptr) {}
@@ -35,6 +38,8 @@ public:
     [[nodiscard]] int getValue() const { return value; }
 
     [[nodiscard]] bool isHeld() const { return playerHolding != nullptr; }
+
+    [[nodiscard]] std::string getItemId() const { return itemId; }
 
     void setHoldingBy(const std::shared_ptr<GameObject> &player) { playerHolding = player; }
 

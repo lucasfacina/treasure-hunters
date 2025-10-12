@@ -39,29 +39,29 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
         case 44: return std::make_shared<ChestObject>(BLUE, x, y);
 
         // Tesouros de Bronze
-        case 278: return std::make_shared<TreasureObject>(id, 10, x, y); // Moeda
-        case 279: return std::make_shared<TreasureObject>(id, 20, x, y); // Pilha Pequena Moeda
-        case 280: return std::make_shared<TreasureObject>(id, 30, x, y); // Pilha Grande Moeda
-        case 281: return std::make_shared<TreasureObject>(id, 40, x, y); // Saco Moeda
-        case 282: return std::make_shared<TreasureObject>(id, 50, x, y); // Cálice
-        case 283: return std::make_shared<TreasureObject>(id, 60, x, y); // Barra
+        case 278: return std::make_shared<TreasureObject>("BronzeCoin", id, 10, x, y);
+        case 279: return std::make_shared<TreasureObject>("BronzeSmallPile", id, 20, x, y);
+        case 280: return std::make_shared<TreasureObject>("BronzeLargePile", id, 30, x, y);
+        case 281: return std::make_shared<TreasureObject>("BronzeBag", id, 40, x, y);
+        case 282: return std::make_shared<TreasureObject>("BronzeChalice", id, 50, x, y);
+        case 283: return std::make_shared<TreasureObject>("BronzeIngot", id, 60, x, y);
 
         // Tesouros de Prata
-        case 295: return std::make_shared<TreasureObject>(id, 15, x, y); // Moeda
-        case 296: return std::make_shared<TreasureObject>(id, 25, x, y); // Pilha Pequena Moeda
-        case 297: return std::make_shared<TreasureObject>(id, 35, x, y); // Pilha Grande Moeda
-        case 298: return std::make_shared<TreasureObject>(id, 45, x, y); // Saco Moeda
-        case 299: return std::make_shared<TreasureObject>(id, 55, x, y); // Cálice
-        case 300: return std::make_shared<TreasureObject>(id, 65, x, y); // Barra
+        case 295: return std::make_shared<TreasureObject>("SilverCoin", id, 15, x, y);
+        case 296: return std::make_shared<TreasureObject>("SilverSmallPile", id, 25, x, y);
+        case 297: return std::make_shared<TreasureObject>("SilverLargePile", id, 35, x, y);
+        case 298: return std::make_shared<TreasureObject>("SilverBag", id, 45, x, y);
+        case 299: return std::make_shared<TreasureObject>("SilverChalice", id, 55, x, y);
+        case 300: return std::make_shared<TreasureObject>("SilverIngot", id, 65, x, y);
 
         // Tesouros de Ouro
-        case 312: return std::make_shared<TreasureObject>(id, 20, x, y); // Moeda
-        case 313: return std::make_shared<TreasureObject>(id, 30, x, y); // Pilha Pequena Moeda
-        case 314: return std::make_shared<TreasureObject>(id, 40, x, y); // Pilha Grande Moeda
-        case 315: return std::make_shared<TreasureObject>(id, 50, x, y); // Saco Moeda
-        case 316: return std::make_shared<TreasureObject>(id, 60, x, y); // Cálice
-        case 317: return std::make_shared<TreasureObject>(id, 70, x, y); // Barra
-        case 318: return std::make_shared<TreasureObject>(id, 100, x, y); // Trevo
+        case 312: return std::make_shared<TreasureObject>("GoldenCoin", id, 20, x, y);
+        case 313: return std::make_shared<TreasureObject>("GoldenSmallPile", id, 30, x, y);
+        case 314: return std::make_shared<TreasureObject>("GoldenLargePile", id, 40, x, y);
+        case 315: return std::make_shared<TreasureObject>("GoldenBag", id, 50, x, y);
+        case 316: return std::make_shared<TreasureObject>("GoldenChalice", id, 60, x, y);
+        case 317: return std::make_shared<TreasureObject>("GoldenIngot", id, 70, x, y);
+        case 318: return std::make_shared<TreasureObject>("GoldenClover", id, 100, x, y);
 
         default: return nullptr;
     }
