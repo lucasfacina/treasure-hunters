@@ -1,21 +1,14 @@
 #ifndef TRABALHO_TILEMAP_GAME_OVER_H
 #define TRABALHO_TILEMAP_GAME_OVER_H
-#include <map>
+
 #include <utility>
 
 #include "screen.h"
-#include "objects/house_slot.h"
+#include "game_over_info.h"
 #include "utils/darken_background.h"
 #include "utils/draw_text.h"
 #include "utils/format_time.h"
-#include "utils/player_type.h"
 
-struct GameOverInfo {
-    int blueScore;
-    int pinkScore;
-    long long matchDurationInSeconds;
-    std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject>>> houseSlotByPlayerType;
-};
 
 class GameOverScreen final : public Screen {
     const GameOverInfo info;
