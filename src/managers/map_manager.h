@@ -180,6 +180,8 @@ public:
 
     int getEmptySlotsCount() const { return this->emptyHouseSlotsCount; }
 
+    auto getHouseSlotByPlayerType() const { return this->houseSlotByPlayerType; }
+
     std::string getScore(PlayerType type) const {
         if (this->scoreByPlayerType[type].empty())
             return "000000";
