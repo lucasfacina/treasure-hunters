@@ -130,6 +130,14 @@ public:
             drawText(command.c_str(), -10, -10);
         }
     }
+
+    void init() override { startNewMatch(); }
+
+    void onFocus() override { startNewMatch(); }
+
+    void onLoseFocus() override {}
+
+    void onExit() override {}
 };
 
 #endif //TRABALHO_TILEMAP_GAME_SCREEN_H

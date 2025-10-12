@@ -10,6 +10,14 @@ public:
     virtual void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) = 0;
 
     virtual void draw() = 0;
+
+    virtual void init() = 0;
+
+    virtual void onFocus() = 0;
+
+    virtual void onLoseFocus() = 0;
+
+    virtual void onExit() = 0;
 };
 
 #endif //TRABALHO_TILEMAP_SCREEN_H
