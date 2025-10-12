@@ -5,11 +5,13 @@
 #include "screens/game_screen.h"
 #include "screens/screen.h"
 
-class GameManager {
+class GameManager final : public std::enable_shared_from_this<GameManager> {
     std::vector<std::shared_ptr<Screen>> screenStack{};
 
 public:
-    explicit GameManager() {
+    explicit GameManager() = default;
+
+    void init() {
         this->pushScreen(std::make_shared<GameScreen>());
     }
 
@@ -26,6 +28,7 @@ public:
             screenStack.back()->onLoseFocus();
         }
 
+        screen->injectGameManager(shared_from_this());
         screen->init();
         screenStack.push_back(screen);
         screen->onFocus();

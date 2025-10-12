@@ -127,6 +127,7 @@ void updateAndDraw() {
     bool stopRunning = false;
     bool shouldRender = true;
     game_manager = make_shared<GameManager>();
+    game_manager->init();
     ALLEGRO_KEYBOARD_STATE key_state;
     ALLEGRO_TRANSFORM transform;
 
