@@ -52,6 +52,8 @@ void calculateScreenSize(int &screen_width, int &screen_height) {
     // Calcula as dimensões finais do display usando o SCALE final
     screen_width = static_cast<int>(Settings::MAP_WIDTH * Settings::TILE_SIZE * Settings::SCALE);
     screen_height = static_cast<int>(Settings::MAP_HEIGHT * Settings::TILE_SIZE * Settings::SCALE);
+    Settings::SCREEN_WIDTH = screen_width;
+    Settings::SCREEN_HEIGHT = screen_height;
 }
 
 int initAllegro() {

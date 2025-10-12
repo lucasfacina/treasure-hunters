@@ -13,6 +13,9 @@ namespace Settings {
    inline ALLEGRO_BITMAP *spritesheet = nullptr;
    inline ALLEGRO_FONT *font = nullptr;
 
+   inline int SCREEN_WIDTH = MAP_WIDTH * TILE_SIZE * SCALE;
+   inline int SCREEN_HEIGHT = MAP_HEIGHT * TILE_SIZE * SCALE;
+
 #ifdef _WIN32
    inline const char *ASSETS_PATH = "assets/";
 #else
