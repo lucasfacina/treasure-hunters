@@ -1,3 +1,4 @@
+#include "api/api_client.h"
 #include "managers/game_manager.h"
 #include "game_over_screen.h"
 
@@ -9,4 +10,9 @@ void GameOverScreen::update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_S
         al_key_down(key_state, ALLEGRO_KEY_ESCAPE)) {
         this->gameManager->popScreen();
     }
+}
+
+void GameOverScreen::init() {
+    auto api_client = std::make_unique<ApiClient>();
+    api_client->submitGameResults(this->info);
 }

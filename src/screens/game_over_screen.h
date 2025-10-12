@@ -51,7 +51,7 @@ public:
         drawText(restartText, centerWidth, screenPortion * 9);
     }
 
-    void init() override {}
+    void init() override;
 
     void onFocus() override {}
 
