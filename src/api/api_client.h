@@ -11,6 +11,17 @@
 
 using json = nlohmann::json;
 
+struct ApiResponse {
+    bool success{};
+    std::string message;
+};
+
+enum class SubmissionState {
+    SENDING,
+    SUCCESS,
+    FAILED
+};
+
 class ApiClient {
     std::string api_key;
     std::string api_host;
@@ -45,10 +56,10 @@ class ApiClient {
 public:
     ApiClient() { this->loadEnvVars(); }
 
-    bool submitGameResults(const GameOverInfo &results) {
+    ApiResponse submitGameResults(const GameOverInfo &results) {
         if (api_key.empty()) {
             std::cerr << "Erro: API Key não configurada. Não foi possível enviar os resultados." << std::endl;
-            return false;
+            return {false, "Erro: API Key não configurada no cliente."};
         }
 
         json payload;
@@ -92,18 +103,18 @@ public:
              */
             std::string host = this->api_host.substr(8);
 
-            httplib::SSLClient client(host.c_str());
+            httplib::SSLClient client(host);
             client.enable_server_certificate_verification(false);
             res = client.Post(
-                this->api_path.c_str(),
+                this->api_path,
                 headers,
                 req_body,
                 "application/json"
             );
         } else {
-            httplib::Client client(this->api_host.c_str());
+            httplib::Client client(this->api_host);
             res = client.Post(
-                this->api_path.c_str(),
+                this->api_path,
                 headers,
                 req_body,
                 "application/json"
@@ -112,19 +123,34 @@ public:
 
         if (res && res->status == 200) {
             std::cout << "Resultados enviados com sucesso!" << std::endl;
-            std::cout << "Resposta do servidor: " << res->body << std::endl;
-            return true;
+            try {
+                json json_response = json::parse(res->body);
+
+                auto data = json_response["result"]["data"]["json"];
+
+                ApiResponse response;
+                response.success = data.value("success", false);
+                response.message = data.value("message", "Resposta sem mensagem.");
+
+                return response;
+            } catch (const json::parse_error &e) {
+                std::cerr << "Erro ao parsear a resposta JSON do servidor: " << e.what() << std::endl;
+                return {false, "Erro ao ler a resposta do servidor."};
+            }
         }
 
         std::cerr << "Falha ao enviar resultados." << std::endl;
         if (res) {
             std::cerr << "Status: " << res->status << std::endl;
             std::cerr << "Body: " << res->body << std::endl;
-        } else {
-            auto err = res.error();
-            std::cerr << "Erro de HTTP: " << httplib::to_string(err) << std::endl;
+            std::string error_message = "Falha no envio. Status: " + std::to_string(res->status);
+            return {false, error_message};
         }
-        return false;
+
+        auto err = res.error();
+        std::cerr << "Erro de HTTP: " << httplib::to_string(err) << std::endl;
+        std::string error_message = "Erro de conexão: " + httplib::to_string(err);
+        return {false, error_message};
     }
 };
 
