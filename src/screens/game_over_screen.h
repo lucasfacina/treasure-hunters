@@ -15,7 +15,7 @@ class GameOverScreen final : public Screen {
     const GameOverInfo info;
 
     std::unique_ptr<ApiClient> apiClient;
-    std::optional<std::future<ApiResponse>> asyncSubmissionResult;
+    std::optional<std::future<ApiResponse<>>> asyncSubmissionResult;
     SubmissionState submissionState;
 
     std::string serverResponseMessage;

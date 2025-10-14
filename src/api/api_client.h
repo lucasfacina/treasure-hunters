@@ -11,7 +11,15 @@
 
 using json = nlohmann::json;
 
+template <typename T = void>
 struct ApiResponse {
+    bool success{};
+    std::string message;
+    T data{};
+};
+
+template <>
+struct ApiResponse<void> {
     bool success{};
     std::string message;
 };
@@ -56,7 +64,7 @@ class ApiClient {
 public:
     ApiClient() { this->loadEnvVars(); }
 
-    ApiResponse submitGameResults(const GameOverInfo &results) {
+    ApiResponse<> submitGameResults(const GameOverInfo &results) {
         if (api_key.empty()) {
             std::cerr << "Erro: API Key não configurada. Não foi possível enviar os resultados." << std::endl;
             return {false, "Erro: API Key não configurada no cliente."};
@@ -128,7 +136,7 @@ public:
 
                 auto data = json_response["result"]["data"]["json"];
 
-                ApiResponse response;
+                ApiResponse<> response;
                 response.success = data.value("success", false);
                 response.message = data.value("message", "Resposta sem mensagem.");
 
