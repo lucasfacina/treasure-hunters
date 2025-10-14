@@ -77,6 +77,8 @@ class GameScreen final : public Screen {
         }
     }
 
+    void _triggerEndMatch();
+
 public:
     void startNewMatch() {
         this->_sendCheckRankedMatch();
@@ -116,7 +118,18 @@ public:
         this->map_manager->updateScore();
     }
 
-    void checkMatchEndCondition();
+    void checkMatchEndCondition() {
+        if (this->isRankedMatch) {
+            if (this->map_manager->getBlueEmptySlotsCount() == 0 ||
+                this->map_manager->getPinkEmptySlotsCount() == 0)
+                return this->_triggerEndMatch();
+
+            return;
+        }
+
+        if (this->map_manager->getEmptySlotsCount() == 0)
+            return this->_triggerEndMatch();
+    }
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
         if (al_key_down(key_state, ALLEGRO_KEY_P))
