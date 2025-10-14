@@ -165,7 +165,7 @@ public:
                 if (const auto treasure = slot->getStoredTresureItem())
                     score += treasure->getValue();
 
-            formated_score << std::setfill('0') << std::setw(6) << score;
+            formated_score << std::setfill('0') << std::setw(4) << score;
 
             this->scoreByPlayerType[type] = formated_score.str();
             formated_score.str("");
@@ -188,7 +188,7 @@ public:
 
     std::string getScore(PlayerType type) const {
         if (this->scoreByPlayerType[type].empty())
-            return "000000";
+            return "0000";
 
         return scoreByPlayerType[type];
     }
@@ -204,8 +204,8 @@ public:
         for (const auto &gameObject: this->allGameObjects)
             gameObject->draw();
 
-        constexpr auto xPadding = 5.5F;
-        constexpr auto yPadding = 0.5F;
+        constexpr auto xPadding = 6.0F;
+        constexpr auto yPadding = 1.3F;
 
         drawText(
             std::format("Score: {}", this->scoreByPlayerType[BLUE]).c_str(),
