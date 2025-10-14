@@ -2,9 +2,12 @@
 #define TRABALHO_TILEMAP_GAME_SCREEN_H
 #include <iostream>
 #include <chrono>
+#include <future>
+
 #include "screen.h"
 #include "utils/assets.h"
 #include "objects/player.h"
+#include "api/api_client.h"
 #include "managers/serial_port.h"
 #include "managers/map_manager.h"
 
@@ -12,6 +15,14 @@ class GameScreen final : public Screen {
     std::shared_ptr<MapManager> map_manager;
     std::shared_ptr<Player> bluePlayer;
     std::shared_ptr<Player> pinkPlayer;
+
+    std::string bluePlayerName;
+    std::string pinkPlayerName;
+
+    std::unique_ptr<ApiClient> apiClient;
+    std::optional<std::future<ApiResponse<IsRankedMatchResponse>>> asyncRankedMatch;
+    bool isRankedMatch = false;
+    std::string matchType = "Amistoso";
 
     std::unique_ptr<SerialPort> arduino;
     bool useSerial = false; // TODO: Ler de .env
@@ -33,8 +44,43 @@ class GameScreen final : public Screen {
         }
     }
 
+    void _sendCheckRankedMatch() {
+        this->apiClient = std::make_unique<ApiClient>();
+
+        this->asyncRankedMatch = std::async(
+            std::launch::async,
+            [client = std::move(this->apiClient)]() {
+                return client->isRankedMatch();
+            }
+        );
+    }
+
+    void _checkRankedMatchResponse() {
+        if (!asyncRankedMatch.has_value()) return;
+
+        auto &request = asyncRankedMatch.value();
+        if (request.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return;
+
+        try {
+            auto response = request.get();
+
+            this->isRankedMatch = response.data.isRanked;
+            if (this->isRankedMatch) {
+                this->bluePlayerName = response.data.bluePlayerName;
+                this->pinkPlayerName = response.data.pinkPlayerName;
+                this->matchType = "Ranqueada";
+            }
+
+            asyncRankedMatch.reset();
+        } catch (const std::exception &e) {
+            std::cerr << "Erro ao verificar partida ranqueada: " << e.what() << std::endl;
+        }
+    }
+
 public:
     void startNewMatch() {
+        this->_sendCheckRankedMatch();
+
         this->matchStartAt = std::chrono::steady_clock::now();
         this->map_manager = std::make_shared<MapManager>();
 
@@ -76,6 +122,8 @@ public:
         if (al_key_down(key_state, ALLEGRO_KEY_P))
             this->startNewMatch();
 
+        this->_checkRankedMatchResponse();
+
         // Reseta comandos seriais antes de ler novos
         bluePlayer->setSerialCommand('0');
         pinkPlayer->setSerialCommand('0');
@@ -106,6 +154,15 @@ public:
         bluePlayer->draw();
         pinkPlayer->draw();
 
+        if (this->isRankedMatch) {
+            drawText(this->matchType.c_str(),
+                     Settings::MAP_WIDTH / 2, 4.5f,
+                     al_map_rgb(227, 180, 68), al_map_rgb(33, 32, 46)
+            );
+        } else {
+            drawText(this->matchType.c_str(), Settings::MAP_WIDTH / 2, 4.5f);
+        }
+
         if (useSerial && arduino && arduino->isConnected()) {
             std::string command = arduino->readLine();
 
@@ -114,10 +171,7 @@ public:
         }
     }
 
-    void init() override {
-        initializeSerial();
-        startNewMatch();
-    }
+    void init() override { initializeSerial(); }
 
     void onFocus() override { startNewMatch(); }
 
