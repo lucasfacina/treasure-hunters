@@ -27,6 +27,8 @@ class MapManager final : public std::enable_shared_from_this<MapManager> {
     std::array<std::string, COUNT> scoreByPlayerType;
 
     int emptyHouseSlotsCount = 0;
+    int blueEmptyHouseSlotsCount = 0;
+    int pinkEmptyHouseSlotsCount = 0;
 
     void loadLayer(const std::shared_ptr<Layer> &layer, const char *filename) {
         FILE *file = fopen(filename, "r");
@@ -175,14 +177,22 @@ public:
 
     void updateEmptySlotsCount() {
         this->emptyHouseSlotsCount = 0;
+        this->blueEmptyHouseSlotsCount = 0;
+        this->pinkEmptyHouseSlotsCount = 0;
 
         for (const auto &[type, slots]: houseSlotByPlayerType)
             for (const auto &slot: slots)
-                if (slot->isEmpty())
+                if (slot->isEmpty()) {
                     this->emptyHouseSlotsCount++;
+
+                    if (type == BLUE) this->blueEmptyHouseSlotsCount++;
+                    else this->pinkEmptyHouseSlotsCount++;
+                }
     }
 
-    int getEmptySlotsCount() const { return this->emptyHouseSlotsCount; }
+    [[nodiscard]] int getEmptySlotsCount() const { return this->emptyHouseSlotsCount; }
+    [[nodiscard]] int getBlueEmptySlotsCount() const { return this->blueEmptyHouseSlotsCount; }
+    [[nodiscard]] int getPinkEmptySlotsCount() const { return this->pinkEmptyHouseSlotsCount; }
 
     auto getHouseSlotByPlayerType() const { return this->houseSlotByPlayerType; }
 
