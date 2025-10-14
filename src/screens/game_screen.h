@@ -73,7 +73,7 @@ public:
     void checkMatchEndCondition();
 
     void update(const ALLEGRO_EVENT *event, const ALLEGRO_KEYBOARD_STATE *key_state) override {
-        if (al_key_down(key_state, ALLEGRO_KEY_R))
+        if (al_key_down(key_state, ALLEGRO_KEY_P))
             this->startNewMatch();
 
         // Reseta comandos seriais antes de ler novos
