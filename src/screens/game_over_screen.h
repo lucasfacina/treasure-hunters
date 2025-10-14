@@ -2,16 +2,32 @@
 #define TRABALHO_TILEMAP_GAME_OVER_H
 
 #include <utility>
+#include <future>
 
 #include "screen.h"
 #include "game_over_info.h"
+#include "api/api_client.h"
 #include "utils/darken_background.h"
 #include "utils/draw_text.h"
 #include "utils/format_time.h"
 
-
 class GameOverScreen final : public Screen {
     const GameOverInfo info;
+
+    std::unique_ptr<ApiClient> apiClient;
+    std::optional<std::future<ApiResponse>> asyncSubmissionResult;
+    SubmissionState submissionState;
+
+    std::string serverResponseMessage;
+    std::string finalScoreText;
+    std::string winnerText;
+    std::string matchDurationText;
+    std::string pressKeyToRestartText;
+
+    std::string formatScore(const int score) {
+        if (score == 1) return "1 ponto";
+        return std::format("{} pontos", score);
+    }
 
 public:
     explicit GameOverScreen(GameOverInfo info) : info(std::move(info)) {}
@@ -24,34 +40,49 @@ public:
         const auto centerWidth = Settings::MAP_WIDTH / 2;
         const auto screenPortion = Settings::MAP_HEIGHT / 10;
 
-        drawText(
-            "Fim de Jogo",
-            centerWidth,
-            screenPortion,
-            al_map_rgb(255, 0, 0),
-            al_map_rgb(128, 0, 0)
+        drawText("Fim de Jogo!",
+                 centerWidth, screenPortion,
+                 al_map_rgb(255, 0, 0), al_map_rgb(110, 0, 0)
         );
-
-        auto winnerText = "Empate!";
-
-        if (info.blueScore > info.pinkScore)
-            winnerText = "Azul venceu!";
-        else if (info.pinkScore > info.blueScore)
-            winnerText = "Rosa venceu!";
-
-        drawText(winnerText, centerWidth, screenPortion * 5);
-
-        drawText(
-            std::format("A partida durou {}", formatTime(info.matchDurationInSeconds)).c_str(),
-            centerWidth, screenPortion * 8
+        drawText(this->serverResponseMessage.c_str(), centerWidth, screenPortion * 2);
+        drawText(this->winnerText.c_str(),
+                 centerWidth, screenPortion * 5,
+                 al_map_rgb(227, 180, 68), al_map_rgb(33, 32, 46)
         );
-
-        // TODO: Aguardar resposta do envio de dados para o servidor
-        auto restartText = "Pressione [ENTER] para reiniciar";
-        drawText(restartText, centerWidth, screenPortion * 9);
+        drawText(this->finalScoreText.c_str(), centerWidth, 1 + screenPortion * 5);
+        drawText(this->matchDurationText.c_str(), centerWidth, screenPortion * 8);
+        drawText(this->pressKeyToRestartText.c_str(), centerWidth, screenPortion * 9);
     }
 
-    void init() override;
+    void init() override {
+        this->finalScoreText = std::format("Azul ({}) vs Rosa ({})", this->info.blueScore, this->info.pinkScore);
+        this->matchDurationText = std::format("A partida durou {}", formatTime(info.matchDurationInSeconds));
+
+        this->winnerText = "Empate!";
+        int scoreAbsoluteDifference = std::abs(this->info.blueScore - this->info.pinkScore);
+        if (this->info.blueScore > this->info.pinkScore)
+            this->winnerText = "Azul";
+        else
+            this->winnerText = "Rosa";
+        if (scoreAbsoluteDifference != 0)
+            this->winnerText = std::format(
+                "{} venceu com {} de vantagem!", this->winnerText, formatScore(scoreAbsoluteDifference)
+            );
+
+        this->submissionState = SubmissionState::SENDING;
+        this->serverResponseMessage = "";
+        this->pressKeyToRestartText = "Enviando resultados da partida...";
+        this->apiClient = std::make_unique<ApiClient>();
+
+        // Usamos uma lambda para mover o unique_ptr do cliente para a nova thread,
+        // garantindo que ele viva o tempo necessário.
+        this->asyncSubmissionResult = std::async(
+            std::launch::async,
+            [client = std::move(this->apiClient), info = this->info]() {
+                return client->submitGameResults(info);
+            }
+        );
+    }
 
     void onFocus() override {}
 
