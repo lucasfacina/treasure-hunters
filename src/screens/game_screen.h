@@ -120,14 +120,14 @@ public:
 
     void checkMatchEndCondition() {
         if (this->isRankedMatch) {
-            if (this->map_manager->getBlueEmptySlotsCount() == 0 ||
-                this->map_manager->getPinkEmptySlotsCount() == 0)
+            if (this->map_manager->getEmptySlotsCount() == 0)
                 return this->_triggerEndMatch();
 
             return;
         }
 
-        if (this->map_manager->getEmptySlotsCount() == 0)
+        if (this->map_manager->getBlueEmptySlotsCount() == 0 ||
+            this->map_manager->getPinkEmptySlotsCount() == 0)
             return this->_triggerEndMatch();
     }
 
