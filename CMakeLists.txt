@@ -42,13 +42,19 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 IF (WIN32)
-    target_link_libraries(${PROJECT_NAME} mingw32 allegro_monolith-debug)
+    set(OPENSSL_ROOT_DIR "C:/msys64/mingw64")
+
     find_package(OpenSSL REQUIRED)
     target_link_libraries(${PROJECT_NAME}
+            PRIVATE
+            mingw32
+            allegro_monolith-debug
             OpenSSL::SSL
             OpenSSL::Crypto
+            ws2_32
+            crypt32
     )
-else ()
+ELSE ()
     include_directories(/opt/homebrew/Cellar/allegro/5.2.10.1/include)
     link_directories(/opt/homebrew/Cellar/allegro/5.2.10.1/lib)
 
