@@ -11,17 +11,23 @@
 
 using json = nlohmann::json;
 
-template <typename T = void>
+template<typename T = void>
 struct ApiResponse {
     bool success{};
     std::string message;
     T data{};
 };
 
-template <>
+template<>
 struct ApiResponse<void> {
     bool success{};
     std::string message;
+};
+
+struct IsRankedMatchResponse {
+    bool isRanked{};
+    std::string bluePlayerName;
+    std::string pinkPlayerName;
 };
 
 enum class SubmissionState {
@@ -33,12 +39,13 @@ enum class SubmissionState {
 class ApiClient {
     std::string api_key;
     std::string api_host;
-    std::string api_path;
+    std::string api_base_path;
+    httplib::Headers headers;
 
     void loadEnvVars() {
         const char *key = std::getenv("GAME_CLIENT_API_KEY");
         const char *host = std::getenv("API_HOST");
-        const char *path = std::getenv("API_PATH");
+        const char *base_path = std::getenv("API_BASE_PATH");
 
         if (key) {
             this->api_key = key;
@@ -53,23 +60,112 @@ class ApiClient {
             this->api_host = "http://localhost:3000";
         }
 
-        if (path) {
-            this->api_path = path;
+        if (base_path) {
+            this->api_base_path = base_path;
         } else {
-            std::cerr << "AVISO: Variável de ambiente API_PATH não definida." << std::endl;
-            this->api_path = "/api/trpc/gameMatch.end";
+            std::cerr << "AVISO: Variável de ambiente API_BASE_PATH não definida." << std::endl;
+            this->api_base_path = "/api/trpc/";
+        }
+    }
+
+    nlohmann::json_abi_v3_11_3::basic_json<> _parseResponse(const std::string &body) {
+        try {
+            json json_response = json::parse(body);
+            return json_response["result"]["data"]["json"];
+        } catch (const json::parse_error &e) {
+            std::cerr << "Erro ao parsear a resposta JSON do servidor: " << e.what() << std::endl;
+            return nullptr;
+        }
+    }
+
+    nlohmann::json_abi_v3_11_3::basic_json<> _post(const std::string &endpoint, const json &payload) {
+        if (api_key.empty()) {
+            std::cerr << "Erro: API Key não configurada. Não foi possível enviar os resultados." << std::endl;
+            return nullptr;
+        }
+
+        json req_envelope;
+        req_envelope["json"] = payload;
+        std::string req_body = req_envelope.dump();
+
+        auto full_path = this->api_base_path + endpoint;
+        std::cout << "[POST] em " << this->api_host << full_path << std::endl;
+
+        httplib::Result res;
+        if (this->api_host.rfind("https://", 0) == 0) {
+            /*
+             * O "https://" na variável de ambiente é
+             * importante para sabermos qual protocolo utilizar,
+             * porém o SSLClient não espera que tenha isso
+             * no início de uma conexão, por isso é importante
+             * removermos da ap_host.
+             */
+            std::string host = this->api_host.substr(8);
+
+            httplib::SSLClient client(host);
+            client.enable_server_certificate_verification(false);
+            res = client.Post(
+                full_path,
+                headers,
+                req_body,
+                "application/json"
+            );
+        } else {
+            httplib::Client client(this->api_host);
+            res = client.Post(
+                full_path,
+                headers,
+                req_body,
+                "application/json"
+            );
+        }
+
+        if (res && res->status == 200) {
+            std::cout << "Requisição enviada com sucesso!" << std::endl;
+            return this->_parseResponse(res->body);
+        }
+
+        return nullptr;
+    }
+
+    nlohmann::json_abi_v3_11_3::basic_json<> _get(const std::string &endpoint) {
+        if (api_key.empty()) {
+            std::cerr << "Erro: API Key não configurada. Não foi possível enviar os resultados." << std::endl;
+            return nullptr;
+        }
+
+        auto full_path = this->api_base_path + endpoint;
+        std::cout << "[GET] em " << this->api_host << full_path << std::endl;
+
+        httplib::Result res;
+        if (this->api_host.rfind("https://", 0) == 0) {
+            std::string host = this->api_host.substr(8);
+
+            httplib::SSLClient client(host);
+            client.enable_server_certificate_verification(false);
+            res = client.Get(full_path, headers);
+        } else {
+            httplib::Client client(this->api_host);
+            res = client.Get(full_path, headers);
+        }
+
+        if (res && res->status == 200) {
+            std::cout << "Requisição enviada com sucesso!" << std::endl;
+            return this->_parseResponse(res->body);
         }
     }
 
 public:
-    ApiClient() { this->loadEnvVars(); }
+    ApiClient() {
+        this->loadEnvVars();
+
+        this->headers = {
+            {"Content-Type", "application/json"},
+            {"x-api-key", this->api_key}
+        };
+    }
 
     ApiResponse<> submitGameResults(const GameOverInfo &results) {
-        if (api_key.empty()) {
-            std::cerr << "Erro: API Key não configurada. Não foi possível enviar os resultados." << std::endl;
-            return {false, "Erro: API Key não configurada no cliente."};
-        }
-
         json payload;
         payload["blueScore"] = results.blueScore;
         payload["pinkScore"] = results.pinkScore;
@@ -89,76 +185,35 @@ public:
         }
         payload["collectedItems"] = collectedItems;
 
-        json req_envelope;
-        req_envelope["json"] = payload;
-        std::string req_body = req_envelope.dump();
+        auto response_data = this->_post("gameMatch.end", payload);
+        if (response_data.is_null())
+            return {false, "Falha ao enviar resultados. Sem resposta do servidor."};
 
-        httplib::Headers headers = {
-            {"Content-Type", "application/json"},
-            {"x-api-key", this->api_key}
-        };
+        return {true, response_data.value("message", "Resultados enviados com sucesso.")};
+    }
 
-        std::cout << "Enviando resultados para: " << this->api_host << this->api_path << std::endl;
+    ApiResponse<IsRankedMatchResponse> isRankedMatch() {
+        const auto data = this->_get("gameMatch.isRankedMatch");
+        if (data.is_null())
+            return {
+                .success = false,
+                .message = "Falha ao verificar se a partida é ranqueada. Sem resposta do servidor.",
+                .data = {
+                    .isRanked = false,
+                    .bluePlayerName = "Azul",
+                    .pinkPlayerName = "Rosa"
+                }
+            };
 
-        httplib::Result res;
-        if (this->api_host.rfind("https://", 0) == 0) {
-            /*
-             * O "https://" na variável de ambiente é
-             * importante para sabermos qual protocolo utilizar,
-             * porém o SSLClient não espera que tenha isso
-             * no início de uma conexão, por isso é importante
-             * removermos da ap_host.
-             */
-            std::string host = this->api_host.substr(8);
-
-            httplib::SSLClient client(host);
-            client.enable_server_certificate_verification(false);
-            res = client.Post(
-                this->api_path,
-                headers,
-                req_body,
-                "application/json"
-            );
-        } else {
-            httplib::Client client(this->api_host);
-            res = client.Post(
-                this->api_path,
-                headers,
-                req_body,
-                "application/json"
-            );
-        }
-
-        if (res && res->status == 200) {
-            std::cout << "Resultados enviados com sucesso!" << std::endl;
-            try {
-                json json_response = json::parse(res->body);
-
-                auto data = json_response["result"]["data"]["json"];
-
-                ApiResponse<> response;
-                response.success = data.value("success", false);
-                response.message = data.value("message", "Resposta sem mensagem.");
-
-                return response;
-            } catch (const json::parse_error &e) {
-                std::cerr << "Erro ao parsear a resposta JSON do servidor: " << e.what() << std::endl;
-                return {false, "Erro ao ler a resposta do servidor."};
+        return {
+            .success = true,
+            .message = data.value("message", "Partida ranqueada verificada com sucesso."),
+            .data = {
+                .isRanked = data.value("isRanked", false),
+                .bluePlayerName = data.value("bluePlayerName", "Azul"),
+                .pinkPlayerName = data.value("pinkPlayerName", "Rosa")
             }
-        }
-
-        std::cerr << "Falha ao enviar resultados." << std::endl;
-        if (res) {
-            std::cerr << "Status: " << res->status << std::endl;
-            std::cerr << "Body: " << res->body << std::endl;
-            std::string error_message = "Falha no envio. Status: " + std::to_string(res->status);
-            return {false, error_message};
-        }
-
-        auto err = res.error();
-        std::cerr << "Erro de HTTP: " << httplib::to_string(err) << std::endl;
-        std::string error_message = "Erro de conexão: " + httplib::to_string(err);
-        return {false, error_message};
+        };
     }
 };
 
