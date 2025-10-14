@@ -153,6 +153,8 @@ class ApiClient {
             std::cout << "Requisição enviada com sucesso!" << std::endl;
             return this->_parseResponse(res->body);
         }
+
+        return nullptr;
     }
 
 public:
