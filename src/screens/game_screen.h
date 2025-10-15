@@ -172,6 +172,20 @@ public:
                      Settings::MAP_WIDTH / 2, 4.5f,
                      al_map_rgb(227, 180, 68), al_map_rgb(33, 32, 46)
             );
+
+            drawText(this->bluePlayerName.c_str(),
+                     bluePlayer->getX() + 0.5f,
+                     bluePlayer->getY() - 0.6f,
+                     al_map_rgb(224, 243, 242),
+                     al_map_rgb(13, 27, 54)
+            );
+
+            drawText(this->pinkPlayerName.c_str(),
+                     pinkPlayer->getX() + 0.5f,
+                     pinkPlayer->getY() - 0.6f,
+                     al_map_rgb(251, 223, 229),
+                     al_map_rgb(54, 4, 33)
+            );
         } else {
             drawText(this->matchType.c_str(), Settings::MAP_WIDTH / 2, 4.5f);
         }
