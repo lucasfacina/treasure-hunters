@@ -68,7 +68,7 @@ class GameScreen final : public Screen {
             if (this->isRankedMatch) {
                 this->bluePlayerName = response.data.bluePlayerName;
                 this->pinkPlayerName = response.data.pinkPlayerName;
-                this->matchType = "Ranqueada";
+                this->matchType = "Competitiva";
             }
 
             asyncRankedMatch.reset();
