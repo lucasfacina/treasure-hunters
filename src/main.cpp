@@ -56,15 +56,14 @@ void calculateScreenSize(int &screen_width, int &screen_height) {
     Settings::SCREEN_HEIGHT = screen_height;
 }
 
-int initAllegro() {
+bool initAllegro() {
     if (!al_init()) {
         printf("Falha ao inicializar Allegro.\n");
         return false;
     }
     if (!al_get_monitor_info(0, &monitor_info)) {
-        // 0 geralmente é o monitor principal
         printf("Falha ao obter informações do monitor.\n");
-        return -1;
+        return false;
     }
     if (!al_install_keyboard()) {
         printf("Falha ao instalar teclado.\n");
@@ -90,14 +89,14 @@ int initAllegro() {
     al_init_font_addon();
     if (!al_init_ttf_addon()) {
         printf("Falha ao inicializar o addon de ttf.\n");
-        return -1;
+        return false;
     }
 
     Settings::font = al_load_font(asset("PressStart2P.ttf"), 8, 0);
     if (!Settings::font) {
         std::cerr << "Falha ao carregar a fonte 'PressStart2P.ttf'." << std::endl;
         al_destroy_display(display);
-        return -1;
+        return false;
     }
 
     event_queue = al_create_event_queue();
