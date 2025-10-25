@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "httplib.h"
 #include "nlohmann/json.hpp"
@@ -43,28 +44,41 @@ class ApiClient {
     httplib::Headers headers;
 
     void loadEnvVars() {
-        const char *key = std::getenv("GAME_CLIENT_API_KEY");
-        const char *host = std::getenv("API_HOST");
-        const char *base_path = std::getenv("API_BASE_PATH");
+        std::string config_path = "config.json";
+        std::ifstream config_file(config_path);
 
-        if (key) {
-            this->api_key = key;
-        } else {
-            std::cerr << "AVISO: Variável de ambiente GAME_CLIENT_API_KEY não definida." << std::endl;
-        }
+        if (!config_file.is_open()) {
+            std::cerr << "ERRO FATAL: Não foi possível abrir '" << config_path << "'." << std::endl;
+            std::cerr << "Verifique se o arquivo existe ao lado do .exe (dentro da pasta assets)." << std::endl;
 
-        if (host) {
-            this->api_host = host;
-        } else {
-            std::cerr << "AVISO: Variável de ambiente API_HOST não definida." << std::endl;
             this->api_host = "http://localhost:3000";
+            this->api_base_path = "/api/trpc/";
+            this->api_key = "";
+            std::cerr << "AVISO: API Key não carregada." << std::endl;
+            return;
         }
 
-        if (base_path) {
-            this->api_base_path = base_path;
-        } else {
-            std::cerr << "AVISO: Variável de ambiente API_BASE_PATH não definida." << std::endl;
+        try {
+            json config = json::parse(config_file);
+
+            this->api_key = config.value("apiKey", "");
+            this->api_host = config.value("apiHost", "http://localhost:3000");
+            this->api_base_path = config.value("apiBasePath", "/api/trpc/");
+
+            if (this->api_key.empty()) {
+                std::cerr << "AVISO: 'apiKey' está vazia ou não foi encontrada em '" << config_path << "'." << std::endl;
+            }
+
+            std::cout << "Configuracao da API carregada de '" << config_path << "'." << std::endl;
+            std::cout << "Host da API: " << this->api_host << std::endl;
+
+        } catch (const json::parse_error& e) {
+            std::cerr << "ERRO FATAL: Erro ao ler '" << config_path << "': " << e.what() << std::endl;
+
+            this->api_host = "http://localhost:3000";
             this->api_base_path = "/api/trpc/";
+            this->api_key = "";
+            std::cerr << "AVISO: API Key não carregada." << std::endl;
         }
     }
 

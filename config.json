@@ -1,0 +1,5 @@
+{
+  "apiKey": "sua-chave-secreta-da-api-aqui",
+  "apiHost": "https://sua-api.com",
+  "apiBasePath": "/api/trpc/"
+}
