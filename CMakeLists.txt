@@ -31,10 +31,19 @@ file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/src/*.h")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES} ${HEADER_FILES})
 
-# --- CONFIGURAÇÃO DO HTTPS ---
-#    Isso é o mesmo que colocar #define CPPHTTPLIB_OPENSSL_SUPPORT no topo do .cpp
+set(ASSET_DIR "${PROJECT_SOURCE_DIR}/assets")
+
+set(DESTINATION_DIR "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets")
+
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${ASSET_DIR}"
+        "${DESTINATION_DIR}"
+        COMMENT "Copiando pasta 'assets' para o diretório de build..."
+)
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
-# --- FIM DA CONFIGURAÇÃO DO HTTPS ---
 
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${nlohmann_json_SOURCE_DIR}/include
