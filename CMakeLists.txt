@@ -112,9 +112,7 @@ IF (WIN32)
             PRIVATE
             mingw32 # Lib do MinGW
 
-            # *** CORREÇÃO DE BUG CRÍTICO ***
             # Usa "generator expressions" para linkar a biblioteca correta:
-            # -debug no modo Debug, -5.2 (release) no modo Release.
             $<$<CONFIG:Debug>:allegro_monolith-debug>
             $<$<CONFIG:Release>:allegro_monolith>
 
