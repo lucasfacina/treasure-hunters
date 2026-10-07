@@ -62,7 +62,7 @@ public:
         int scoreAbsoluteDifference = std::abs(this->info.blueScore - this->info.pinkScore);
         if (this->info.blueScore > this->info.pinkScore)
             this->winnerText = "Azul";
-        else
+        else if (this->info.blueScore < this->info.pinkScore)
             this->winnerText = "Rosa";
         if (scoreAbsoluteDifference != 0)
             this->winnerText = std::format(
