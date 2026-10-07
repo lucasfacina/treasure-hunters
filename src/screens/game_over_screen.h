@@ -21,6 +21,7 @@ class GameOverScreen final : public Screen {
     std::string serverResponseMessage;
     std::string finalScoreText;
     std::string winnerText;
+    std::pair<ALLEGRO_COLOR, ALLEGRO_COLOR> winnerColor;
     std::string matchDurationText;
     std::string pressKeyToRestartText;
 
@@ -47,7 +48,7 @@ public:
         drawText(this->serverResponseMessage.c_str(), centerWidth, screenPortion * 2);
         drawText(this->winnerText.c_str(),
                  centerWidth, screenPortion * 5,
-                 al_map_rgb(227, 180, 68), al_map_rgb(33, 32, 46)
+                 this->winnerColor.first, this->winnerColor.second
         );
         drawText(this->finalScoreText.c_str(), centerWidth, 1 + screenPortion * 5);
         drawText(this->matchDurationText.c_str(), centerWidth, screenPortion * 8);
@@ -59,11 +60,15 @@ public:
         this->matchDurationText = std::format("A partida durou {}", formatTime(info.matchDurationInSeconds));
 
         this->winnerText = "Empate!";
+        this->winnerColor = {al_map_rgb(227, 180, 68), al_map_rgb(33, 32, 46)};
         int scoreAbsoluteDifference = std::abs(this->info.blueScore - this->info.pinkScore);
-        if (this->info.blueScore > this->info.pinkScore)
+        if (this->info.blueScore > this->info.pinkScore) {
             this->winnerText = "Azul";
-        else if (this->info.blueScore < this->info.pinkScore)
+            this->winnerColor = {al_map_rgb(224, 243, 242), al_map_rgb(13, 27, 54)};
+        } else if (this->info.blueScore < this->info.pinkScore) {
             this->winnerText = "Rosa";
+            this->winnerColor = {al_map_rgb(251, 223, 229), al_map_rgb(54, 4, 33)};
+        }
         if (scoreAbsoluteDifference != 0)
             this->winnerText = std::format(
                 "{} venceu com {} de vantagem!", this->winnerText, formatScore(scoreAbsoluteDifference)
