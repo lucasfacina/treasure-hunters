@@ -22,7 +22,7 @@ class GameScreen final : public Screen {
     std::unique_ptr<ApiClient> apiClient;
     std::optional<std::future<ApiResponse<IsRankedMatchResponse>>> asyncRankedMatch;
     bool isRankedMatch = false;
-    std::string matchType = "Amistoso";
+    std::string matchType;
 
     std::unique_ptr<SerialPort> arduino;
     bool useSerial = false; // TODO: Ler de .env
@@ -69,6 +69,8 @@ class GameScreen final : public Screen {
                 this->bluePlayerName = response.data.bluePlayerName;
                 this->pinkPlayerName = response.data.pinkPlayerName;
                 this->matchType = "Competitiva";
+            } else {
+                this->matchType = "Amistoso";
             }
 
             asyncRankedMatch.reset();
