@@ -186,6 +186,7 @@ public:
         payload["blueScore"] = results.blueScore;
         payload["pinkScore"] = results.pinkScore;
         payload["durationSeconds"] = results.matchDurationInSeconds;
+        payload["isRanked"] = results.isRanked;
 
         json collectedItems = json::array();
         for (const auto &[playerType, houseSlots]: results.houseSlotByPlayerType) {

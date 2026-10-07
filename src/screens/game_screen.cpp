@@ -14,6 +14,7 @@ void GameScreen::_triggerEndMatch() {
         .blueScore = std::stoi(map_manager->getScore(BLUE)),
         .pinkScore = std::stoi(map_manager->getScore(PINK)),
         .matchDurationInSeconds = durationInSeconds,
+        .isRanked = isRankedMatch,
         .houseSlotByPlayerType = map_manager->getHouseSlotByPlayerType()
     }));
 }

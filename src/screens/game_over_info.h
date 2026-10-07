@@ -11,6 +11,7 @@ struct GameOverInfo {
     int blueScore;
     int pinkScore;
     long long matchDurationInSeconds;
+    bool isRanked;
     std::map<PlayerType, std::vector<std::shared_ptr<HouseSlotObject>>> houseSlotByPlayerType;
 };
 
