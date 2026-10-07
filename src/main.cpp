@@ -28,32 +28,24 @@ ALLEGRO_EVENT event;
 
 shared_ptr<GameManager> game_manager;
 
-void calculateScreenSize(int &screen_width, int &screen_height) {
-    // Largura e altura DISPONÍVEL do monitor
-    int monitor_width = monitor_info.x2 - monitor_info.x1;
-    int monitor_height = monitor_info.y2 - monitor_info.y1;
+// Deslocamento usado para centralizar o mapa na tela (faixas pretas nas laterais
+// ou em cima/embaixo quando a proporção do monitor é diferente da do mapa)
+float OFFSET_X = 0;
+float OFFSET_Y = 0;
 
-    // Calcula o fator de escala baseado na LARGURA DISPONÍVEL
-    // Quanto do monitor a largura do nosso mapa (em pixels) ocuparia
-    float scale_by_width = static_cast<float>(monitor_width) / (Settings::MAP_WIDTH * Settings::TILE_SIZE);
+void calculateScale(int display_width, int display_height) {
+    const float map_width = Settings::MAP_WIDTH * Settings::TILE_SIZE;
+    const float map_height = Settings::MAP_HEIGHT * Settings::TILE_SIZE;
 
-    // Calcula o fator de escala baseado na ALTURA DISPONÍVEL
-    // Quanto do monitor a altura do nosso mapa (em pixels) ocuparia
-    float scale_by_height = static_cast<float>(monitor_height) / (Settings::MAP_HEIGHT * Settings::TILE_SIZE);
+    // Maior escala possível em que o mapa inteiro ainda cabe na tela, sem distorcer
+    Settings::SCALE = std::min(display_width / map_width, display_height / map_height);
 
-    // Escolhe o MENOR fator de escala para garantir que o mapa CAIBA no monitor
-    Settings::SCALE = std::min(scale_by_width, scale_by_height);
+    // Centraliza o mapa
+    OFFSET_X = (display_width - map_width * Settings::SCALE) / 2.0f;
+    OFFSET_Y = (display_height - map_height * Settings::SCALE) / 2.0f;
 
-    // Reduz o SCALE se não for 1 para evitar que o mapa fique muito grande
-    Settings::SCALE *= Settings::SCALE != 1
-                           ? 0.9F
-                           : 1.0f;
-
-    // Calcula as dimensões finais do display usando o SCALE final
-    screen_width = static_cast<int>(Settings::MAP_WIDTH * Settings::TILE_SIZE * Settings::SCALE);
-    screen_height = static_cast<int>(Settings::MAP_HEIGHT * Settings::TILE_SIZE * Settings::SCALE);
-    Settings::SCREEN_WIDTH = screen_width;
-    Settings::SCREEN_HEIGHT = screen_height;
+    Settings::SCREEN_WIDTH = display_width;
+    Settings::SCREEN_HEIGHT = display_height;
 }
 
 bool initAllegro() {
@@ -78,13 +70,17 @@ bool initAllegro() {
         return false;
     }
 
-    int screen_width, screen_height;
-    calculateScreenSize(screen_width, screen_height);
-    display = al_create_display(screen_width, screen_height);
+    // Tela cheia sem bordas, na resolução nativa do monitor
+    int monitor_width = monitor_info.x2 - monitor_info.x1;
+    int monitor_height = monitor_info.y2 - monitor_info.y1;
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
+    display = al_create_display(monitor_width, monitor_height);
     if (!display) {
         printf("Falha ao criar display.\n");
         return false;
     }
+    calculateScale(al_get_display_width(display), al_get_display_height(display));
+    al_hide_mouse_cursor(display);
 
     al_init_font_addon();
     if (!al_init_ttf_addon()) {
@@ -138,6 +134,7 @@ void updateAndDraw() {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             al_identity_transform(&transform);
             al_scale_transform(&transform, Settings::SCALE, Settings::SCALE);
+            al_translate_transform(&transform, OFFSET_X, OFFSET_Y);
             al_use_transform(&transform);
             game_manager->draw();
             al_flip_display();
