@@ -63,6 +63,10 @@ inline std::shared_ptr<GameObject> createById(const int id, const int x, const i
         case 317: return std::make_shared<TreasureObject>("GoldenIngot", id, 70, x, y);
         case 318: return std::make_shared<TreasureObject>("GoldenClover", id, 100, x, y);
 
+        // Diamantes
+        case 301: return std::make_shared<TreasureObject>("BlueDiamond", id, 200, x, y);
+        case 284: return std::make_shared<TreasureObject>("PinkDiamond", id, 200, x, y);
+
         default: return nullptr;
     }
 }
