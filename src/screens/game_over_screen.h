@@ -64,10 +64,10 @@ public:
         int scoreAbsoluteDifference = std::abs(this->info.blueScore - this->info.pinkScore);
         if (this->info.blueScore > this->info.pinkScore) {
             this->winnerText = "Azul";
-            this->winnerColor = {al_map_rgb(224, 243, 242), al_map_rgb(13, 27, 54)};
+            this->winnerColor = {al_map_rgb(38, 211, 255), al_map_rgb(13, 27, 54)};
         } else if (this->info.blueScore < this->info.pinkScore) {
             this->winnerText = "Rosa";
-            this->winnerColor = {al_map_rgb(251, 223, 229), al_map_rgb(54, 4, 33)};
+            this->winnerColor = {al_map_rgb(237, 82, 242), al_map_rgb(54, 4, 33)};
         }
         if (scoreAbsoluteDifference != 0)
             this->winnerText = std::format(
