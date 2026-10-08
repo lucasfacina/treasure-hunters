@@ -3,6 +3,9 @@
 #include <iostream>
 #include <chrono>
 #include <future>
+#include <format>
+#include <optional>
+#include <utility>
 
 #include "screen.h"
 #include "utils/assets.h"
@@ -27,7 +30,15 @@ class GameScreen final : public Screen {
     std::unique_ptr<SerialPort> arduino;
     bool useSerial = false; // TODO: Ler de .env
 
-    std::chrono::steady_clock::time_point matchStartAt;
+    std::optional<std::chrono::steady_clock::time_point> matchStartAt;
+    std::optional<std::chrono::steady_clock::time_point> matchEndAt;
+
+    long long _getMatchElapsedSeconds() const {
+        if (!matchStartAt.has_value()) return 0;
+
+        const auto end = matchEndAt.value_or(std::chrono::steady_clock::now());
+        return std::chrono::duration_cast<std::chrono::seconds>(end - matchStartAt.value()).count();
+    }
 
     void initializeSerial() {
         if (!useSerial) return;
@@ -85,7 +96,8 @@ public:
     void startNewMatch() {
         this->_sendCheckRankedMatch();
 
-        this->matchStartAt = std::chrono::steady_clock::now();
+        this->matchStartAt.reset();
+        this->matchEndAt.reset();
         this->map_manager = std::make_shared<MapManager>();
 
         this->map_manager->addLayer(asset("mapa_fundo_grama.csv"));
@@ -158,8 +170,18 @@ public:
             }
         }
 
+        const auto bluePosition = std::make_pair(bluePlayer->getX(), bluePlayer->getY());
+        const auto pinkPosition = std::make_pair(pinkPlayer->getX(), pinkPlayer->getY());
+
         bluePlayer->update(event, key_state);
         pinkPlayer->update(event, key_state);
+
+        // O cronômetro inicia no primeiro movimento de qualquer jogador
+        if (!matchStartAt.has_value() &&
+            (bluePosition != std::make_pair(bluePlayer->getX(), bluePlayer->getY()) ||
+             pinkPosition != std::make_pair(pinkPlayer->getX(), pinkPlayer->getY()))
+        )
+            this->matchStartAt = std::chrono::steady_clock::now();
 
         checkMatchEndCondition();
     }
@@ -168,6 +190,12 @@ public:
         map_manager->draw();
         bluePlayer->draw();
         pinkPlayer->draw();
+
+        if (matchStartAt.has_value()) {
+            const auto elapsed = this->_getMatchElapsedSeconds();
+            drawText(std::format("{:02}m{:02}s", elapsed / 60, elapsed % 60).c_str(),
+                     Settings::MAP_WIDTH / 2, 3.5f);
+        }
 
         if (this->isRankedMatch) {
             drawText(this->matchType.c_str(),
